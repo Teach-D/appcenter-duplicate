@@ -81,7 +81,8 @@
             go.deadline,
             go.price,
             go.current_people,
-            go.max_people
+            go.max_people,
+            go.group_order_type
 
         FROM group_order_like gol
         LEFT JOIN group_order go ON gol.group_order_id = go.id
@@ -98,13 +99,13 @@
         SELECT i.file_path
         FROM image i
         WHERE i.image_type = 'GROUP_ORDER' AND i.board_id = go.id
-        LIMIT 1 <!--하나만 선택-->
+        LIMIT 1
         ) AS file_path,
-
         go.deadline,
         go.price,
         go.current_people,
-        go.max_people
+        go.max_people,
+        go.group_order_type  <!-- 이 줄 추가 -->
 
         FROM group_order go
         WHERE go.user_id = #{userId}
