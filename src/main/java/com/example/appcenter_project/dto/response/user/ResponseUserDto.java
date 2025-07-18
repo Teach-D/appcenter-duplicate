@@ -17,10 +17,10 @@ public class ResponseUserDto {
 
     public static ResponseUserDto entityToDto(User user) {
         return ResponseUserDto.builder()
-                .name(user.getName())
+                .name(user.getName() != null ? user.getName() : "")
                 .studentNumber(user.getStudentNumber())
-                .dormType(String.valueOf(user.getDormType()))
-                .college(String.valueOf(user.getCollege()))
+                .dormType(user.getDormType() != null ? user.getDormType().toValue() : "")
+                .college(user.getCollege() != null ? user.getCollege().toValue() : "")
                 .penalty(user.getPenalty())
                 .build();
     }
