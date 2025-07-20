@@ -69,7 +69,7 @@ public class UserController implements UserApiSpecification {
     }
 */
 
-    @GetMapping("/image")
+    @GetMapping(value = "/image", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ImageLinkDto> findUserImageByUserId(@AuthenticationPrincipal CustomUserDetails user, HttpServletRequest request) {
         ImageLinkDto imageLinkDto = imageService.findUserImageUrlByUserId(user.getId(), request);
 
