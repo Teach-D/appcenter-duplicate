@@ -1,6 +1,7 @@
 package com.example.appcenter_project.controller.user;
 
 import com.example.appcenter_project.dto.ImageDto;
+import com.example.appcenter_project.dto.ImageLinkDto;
 import com.example.appcenter_project.dto.request.user.RequestUserDto;
 import com.example.appcenter_project.dto.request.user.SignupUser;
 import com.example.appcenter_project.dto.response.like.ResponseLikeDto;
@@ -10,6 +11,7 @@ import com.example.appcenter_project.dto.response.user.ResponseUserDto;
 import com.example.appcenter_project.security.CustomUserDetails;
 import com.example.appcenter_project.service.image.ImageService;
 import com.example.appcenter_project.service.user.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +58,7 @@ public class UserController implements UserApiSpecification {
         return ResponseEntity.status(OK).body(userService.findUserByUserId(user.getId()));
     }
 
+/*
     @GetMapping("/image")
     public ResponseEntity<Resource> findUserImageByUserId(@AuthenticationPrincipal CustomUserDetails user) {
         ImageDto imageDto = imageService.findUserImageByUserId(user.getId());
@@ -63,6 +66,14 @@ public class UserController implements UserApiSpecification {
         return ResponseEntity.status(OK)
                 .contentType(MediaType.parseMediaType(imageDto.getContentType()))
                 .body(imageDto.getResource());
+    }
+*/
+
+    @GetMapping("/image")
+    public ResponseEntity<ImageLinkDto> findUserImageByUserId(@AuthenticationPrincipal CustomUserDetails user, HttpServletRequest request) {
+        ImageLinkDto imageLinkDto = imageService.findUserImageUrlByUserId(user.getId(), request);
+
+        return ResponseEntity.status(OK).body(imageLinkDto);
     }
 
     @GetMapping("/board")
