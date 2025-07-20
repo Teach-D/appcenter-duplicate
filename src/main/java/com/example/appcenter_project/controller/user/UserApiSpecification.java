@@ -1,5 +1,6 @@
 package com.example.appcenter_project.controller.user;
 
+import com.example.appcenter_project.dto.ImageLinkDto;
 import com.example.appcenter_project.dto.request.user.RequestUserDto;
 import com.example.appcenter_project.dto.request.user.SignupUser;
 import com.example.appcenter_project.dto.response.user.ResponseBoardDto;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -95,7 +97,7 @@ public interface UserApiSpecification {
                     )
             }
     )
-    ResponseEntity<Resource> findUserImageByUserId(@AuthenticationPrincipal CustomUserDetails user);
+    ResponseEntity<ImageLinkDto> findUserImageByUserId(@AuthenticationPrincipal CustomUserDetails user, HttpServletRequest request);
 
     @Operation(
             summary = "사용자가 작성한 게시글 조회",

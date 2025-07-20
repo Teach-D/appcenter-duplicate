@@ -1,6 +1,7 @@
 package com.example.appcenter_project.service.image;
 
 import com.example.appcenter_project.dto.ImageDto;
+import com.example.appcenter_project.dto.ImageLinkDto;
 import com.example.appcenter_project.entity.Image;
 import com.example.appcenter_project.entity.user.User;
 import com.example.appcenter_project.enums.image.ImageType;
@@ -9,6 +10,7 @@ import com.example.appcenter_project.exception.ErrorCode;
 import com.example.appcenter_project.repository.image.ImageRepository;
 import com.example.appcenter_project.repository.user.UserRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -202,6 +204,80 @@ public class ImageService {
 
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public ImageLinkDto findUserImageUrlByUserId(Long userId, HttpServletRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Image image = user.getImage();
+        if (image == null) {
+            throw new CustomException(ErrorCode.IMAGE_NOT_FOUND);
+        }
+
+        // 파일 존재 확인
+        File file = new File(image.getFilePath());
+        if (!file.exists()) {
+            log.error("Image file not found: {}", image.getFilePath());
+            throw new CustomException(ErrorCode.IMAGE_NOT_FOUND);
+        }
+
+        // 이미지 URL 생성
+        String baseUrl = getBaseUrl(request);
+        String imageUrl = baseUrl + "/api/images/" + image.getId();
+
+        return ImageLinkDto.builder()
+                .imageUrl(imageUrl)
+                .fileName(image.getFilePath())
+                .contentType(getContentType(file))
+                .fileSize(file.length())
+                .build();
+    }
+
+    // 유틸리티: 베이스 URL 생성
+    private String getBaseUrl(HttpServletRequest request) {
+        String scheme = request.getScheme();
+        String serverName = request.getServerName();
+        int serverPort = request.getServerPort();
+        String contextPath = request.getContextPath();
+
+        StringBuilder baseUrl = new StringBuilder();
+        baseUrl.append(scheme).append("://").append(serverName);
+
+        // 기본 포트가 아닌 경우에만 포트 추가
+        if ((scheme.equals("http") && serverPort != 80) ||
+                (scheme.equals("https") && serverPort != 443)) {
+            baseUrl.append(":").append(serverPort);
+        }
+
+        baseUrl.append(contextPath);
+        return baseUrl.toString();
+    }
+
+    // 유틸리티: 파일 컨텐츠 타입 확인
+    private String getContentType(File file) {
+        try {
+            String contentType = Files.probeContentType(file.toPath());
+            if (contentType == null) {
+                // 확장자 기반 fallback
+                String fileName = file.getName().toLowerCase();
+                if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+                    return "image/jpeg";
+                } else if (fileName.endsWith(".png")) {
+                    return "image/png";
+                } else if (fileName.endsWith(".gif")) {
+                    return "image/gif";
+                } else if (fileName.endsWith(".webp")) {
+                    return "image/webp";
+                } else {
+                    return "application/octet-stream";
+                }
+            }
+            return contentType;
+        } catch (IOException e) {
+            log.error("Could not determine file type for: {}", file.getPath(), e);
+            throw new RuntimeException("Could not determine file type.", e);
         }
     }
 }
