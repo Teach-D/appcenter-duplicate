@@ -73,8 +73,9 @@ public class UserController implements UserApiSpecification {
     public ResponseEntity<ImageLinkDto> findUserImageByUserId(@AuthenticationPrincipal CustomUserDetails user, HttpServletRequest request) {
         ImageLinkDto imageLinkDto = imageService.findUserImageUrlByUserId(user.getId(), request);
 
-        return ResponseEntity.status(OK).body(imageLinkDto);
-    }
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(imageLinkDto);    }
 
     @GetMapping("/board")
     public ResponseEntity<List<ResponseBoardDto>> findBoardByUserId(@AuthenticationPrincipal CustomUserDetails user) {
