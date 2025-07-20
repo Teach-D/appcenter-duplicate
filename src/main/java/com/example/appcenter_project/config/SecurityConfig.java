@@ -38,7 +38,10 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**").permitAll()
-                        .requestMatchers("/users", "/images/default/users", "/users/refreshToken").permitAll()
+                        .requestMatchers("/users", "/users/refreshToken").permitAll()
+                        // 이미지 관련 엔드포인트 모두 허용
+                        .requestMatchers("/images/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/static/**").permitAll()
                         .requestMatchers("/**").hasRole("USER")
                         .anyRequest().authenticated())
                 .sessionManagement(sessionManagement ->

@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -69,13 +70,21 @@ public class UserController implements UserApiSpecification {
     }
 */
 
-    @GetMapping(value = "/image", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ImageLinkDto> findUserImageByUserId(@AuthenticationPrincipal CustomUserDetails user, HttpServletRequest request) {
-        ImageLinkDto imageLinkDto = imageService.findUserImageUrlByUserId(user.getId(), request);
+    @GetMapping(value = "/image")
+    public ResponseEntity<ImageLinkDto> findUserImageByUserId(
+            @AuthenticationPrincipal CustomUserDetails user,
+            HttpServletRequest request) {
+        try {
+            ImageLinkDto imageLinkDto = imageService.findUserImageUrlByUserId(user.getId(), request);
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(imageLinkDto);    }
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                    .body(imageLinkDto);
+        } catch (Exception e) {
+            log.error("Error retrieving user image: ", e);
+            throw e;
+        }
+    }
 
     @GetMapping("/board")
     public ResponseEntity<List<ResponseBoardDto>> findBoardByUserId(@AuthenticationPrincipal CustomUserDetails user) {

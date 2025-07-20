@@ -25,6 +25,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.UUID;
 
 import static com.example.appcenter_project.exception.ErrorCode.*;
@@ -113,18 +115,29 @@ public class ImageService {
 
         // 이미 user의 이미지가 defaultImage인 경우
         if (file != null && user.getImage().getIsDefault()) {
-            String projectPath = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\images\\user\\";
-            UUID uuid = UUID.randomUUID();
-            String imageFileName = uuid + "_" + file.getOriginalFilename();
+            // 운영 환경에 맞는 경로 설정
+            String imagePath = "/app/images/user/";
 
-            File destinationFile = new File(projectPath + imageFileName);
+            // 파일 확장자 추출
+            String fileExtension = getFileExtension(file.getOriginalFilename());
+
+            // 사용자별 고유 파일명 생성 (user_${userId}.확장자)
+            String imageFileName = "user_" + userId + fileExtension;
+
+            // 디렉토리 생성 (존재하지 않으면)
+            File directory = new File(imagePath);
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+
+            File destinationFile = new File(imagePath + imageFileName);
 
             try {
                 file.transferTo(destinationFile);
 
                 // 이미지 객체 생성 후 저장
                 Image image = Image.builder()
-                        .filePath(projectPath + imageFileName)
+                        .filePath(imagePath + imageFileName)
                         .isDefault(false)
                         .imageType(ImageType.USER)
                         .build();
@@ -134,30 +147,64 @@ public class ImageService {
                 user.updateImage(image);
 
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                log.error("Failed to save image file for user {}: ", userId, e);
             }
         }
         // 해당 유저의 이미지가 defaultImage가 아닌 이미지일 때 새로운 이미지로 수정하는 경우
         else if (file != null) {
-            String filePath = user.getImage().getFilePath();
+            String oldFilePath = user.getImage().getFilePath();
 
-            new File(filePath).delete();
+            // 기존 파일 삭제
+            File oldFile = new File(oldFilePath);
+            if (oldFile.exists()) {
+                oldFile.delete();
+            }
 
-            String projectPath = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\images\\user\\";
-            UUID uuid = UUID.randomUUID();
-            String imageFileName = uuid + "_" + file.getOriginalFilename();
+            // 새 파일 경로 설정
+            String imagePath = "/app/images/user/";
+            String fileExtension = getFileExtension(file.getOriginalFilename());
+            String imageFileName = "user_" + userId + fileExtension;
 
-            File destinationFile = new File(projectPath + imageFileName);
+            // 디렉토리 생성 (존재하지 않으면)
+            File directory = new File(imagePath);
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
 
-            Image image = imageRepository.findByFilePath(filePath).orElseThrow(() -> new CustomException(IMAGE_NOT_FOUND));
-            image.updateFilePath(projectPath + imageFileName);
+            File destinationFile = new File(imagePath + imageFileName);
+
+            Image image = imageRepository.findByFilePath(oldFilePath)
+                    .orElseThrow(() -> new CustomException(IMAGE_NOT_FOUND));
+            image.updateFilePath(imagePath + imageFileName);
 
             try {
                 file.transferTo(destinationFile);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                log.error("Failed to update image file for user {}: ", userId, e);
             }
         }
+    }
+
+    // 파일 확장자 추출 헬퍼 메소드
+    private String getFileExtension(String fileName) {
+        if (fileName == null || fileName.isEmpty()) {
+            return ".jpg"; // 기본 확장자
+        }
+
+        int lastDotIndex = fileName.lastIndexOf(".");
+        if (lastDotIndex == -1) {
+            return ".jpg"; // 확장자가 없으면 기본값
+        }
+
+        return fileName.substring(lastDotIndex).toLowerCase();
+    }
+
+    // 안전한 파일명 생성 (특수문자 제거)
+    private String sanitizeFileName(String fileName) {
+        if (fileName == null) return "image";
+
+        // 특수문자를 언더스코어로 대체
+        return fileName.replaceAll("[^a-zA-Z0-9._-]", "_");
     }
 
     public ImageDto findUserImageByUserId(Long userId) {
@@ -208,31 +255,116 @@ public class ImageService {
     }
 
     public ImageLinkDto findUserImageUrlByUserId(Long userId, HttpServletRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        try {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        Image image = user.getImage();
-        if (image == null) {
-            throw new CustomException(ErrorCode.IMAGE_NOT_FOUND);
+            Image image = user.getImage();
+            if (image == null) {
+                throw new CustomException(ErrorCode.IMAGE_NOT_FOUND);
+            }
+
+            // 파일 존재 확인
+            File file = new File(image.getFilePath());
+            log.info("Checking file: {}", image.getFilePath());
+            log.info("File exists: {}", file.exists());
+            log.info("File readable: {}", file.canRead());
+            log.info("File size: {}", file.length());
+
+            if (!file.exists()) {
+                log.error("Image file not found: {}", image.getFilePath());
+
+                // 디렉토리 존재 여부도 확인
+                File parentDir = file.getParentFile();
+                log.error("Parent directory exists: {}", parentDir.exists());
+                if (parentDir.exists()) {
+                    log.error("Files in directory: {}", Arrays.toString(parentDir.listFiles()));
+                }
+
+                throw new CustomException(ErrorCode.IMAGE_NOT_FOUND);
+            }
+
+            // 이미지 URL 생성 (기존 API 방식)
+            String baseUrl = getBaseUrl(request);
+            String imageUrl = baseUrl + "/api/images/" + image.getId();
+
+            // 정적 리소스 URL 생성 (직접 접근 가능)
+            String staticImageUrl = getStaticImageUrl(image.getFilePath(), baseUrl);
+
+            // 안전한 컨텐츠 타입 확인
+            String contentType = getSafeContentType(file);
+
+            // 실제 파일명 추출 (경로에서 파일명만)
+            String actualFileName = Paths.get(image.getFilePath()).getFileName().toString();
+
+            return ImageLinkDto.builder()
+                    .imageUrl(imageUrl)
+                    .fileName(staticImageUrl)  // 정적 리소스로 직접 접근 가능한 URL
+                    .contentType(contentType)
+                    .fileSize(file.length())
+                    .build();
+        } catch (Exception e) {
+            log.error("Error in findUserImageByUserId: ", e);
+            throw e;
         }
+    }
 
-        // 파일 존재 확인
-        File file = new File(image.getFilePath());
-        if (!file.exists()) {
-            log.error("Image file not found: {}", image.getFilePath());
-            throw new CustomException(ErrorCode.IMAGE_NOT_FOUND);
+    // 정적 리소스 URL 생성 헬퍼 메소드
+    private String getStaticImageUrl(String filePath, String baseUrl) {
+        try {
+            // 파일 경로에서 static 이후 경로 추출
+            // 예: /path/to/resources/static/images/user/file.png -> /images/user/file.png
+            String staticPath = extractStaticPath(filePath);
+            return baseUrl + staticPath;
+        } catch (Exception e) {
+            log.warn("Could not generate static URL for path: {}", filePath);
+            return null;
         }
+    }
 
-        // 이미지 URL 생성
-        String baseUrl = getBaseUrl(request);
-        String imageUrl = baseUrl + "/api/images/" + image.getId();
+    // static 폴더 이후의 경로를 추출
+    private String extractStaticPath(String fullPath) {
+        // 실제 파일 경로에서 resources/static 이후의 경로를 추출
+        // 또는 단순히 파일명으로만 구성된 경우 /images/user/ 경로로 조합
+        String fileName = Paths.get(fullPath).getFileName().toString();
+        return "/images/user/" + fileName;
+    }
 
-        return ImageLinkDto.builder()
-                .imageUrl(imageUrl)
-                .fileName(image.getFilePath())
-                .contentType(getContentType(file))
-                .fileSize(file.length())
-                .build();
+    // 유틸리티: 안전한 파일 컨텐츠 타입 확인
+    private String getSafeContentType(File file) {
+        try {
+            String fileName = file.getName().toLowerCase();
+
+            // 확장자 기반으로 먼저 판단 (더 안정적)
+            if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+                return "image/jpeg";
+            } else if (fileName.endsWith(".png")) {
+                return "image/png";
+            } else if (fileName.endsWith(".gif")) {
+                return "image/gif";
+            } else if (fileName.endsWith(".webp")) {
+                return "image/webp";
+            } else if (fileName.endsWith(".svg")) {
+                return "image/svg+xml";
+            }
+
+            // Files.probeContentType이 실패할 수 있으므로 try-catch
+            try {
+                String detectedType = Files.probeContentType(file.toPath());
+                if (detectedType != null && detectedType.startsWith("image/")) {
+                    return detectedType;
+                }
+            } catch (Exception e) {
+                log.warn("Could not probe content type for file: {}", file.getName());
+            }
+
+            // 기본값
+            return "image/jpeg";
+
+        } catch (Exception e) {
+            log.error("Error determining content type for file: {}", file.getName(), e);
+            return "image/jpeg"; // 안전한 기본값
+        }
     }
 
     // 유틸리티: 베이스 URL 생성
