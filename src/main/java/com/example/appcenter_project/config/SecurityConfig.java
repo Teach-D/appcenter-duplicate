@@ -17,6 +17,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import static org.springframework.http.HttpMethod.*;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -39,6 +41,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**").permitAll()
                         .requestMatchers("/users", "/users/refreshToken").permitAll()
+                        .requestMatchers(GET, "/tips/**", "/group-orders/**", "/roommates/**").permitAll()
                         // 이미지 관련 엔드포인트 모두 허용
                         .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/static/**").permitAll()
