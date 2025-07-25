@@ -8,6 +8,7 @@ import com.example.appcenter_project.dto.response.roommate.ResponseRuleDto;
 import com.example.appcenter_project.security.CustomUserDetails;
 import com.example.appcenter_project.service.roommate.MyRoommateService;
 import com.example.appcenter_project.service.roommate.RoommateService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,9 +21,9 @@ public class MyRoommateController implements MyRoommateApiSpecification {
 
     private final MyRoommateService myRoommateService;
     @GetMapping("/informations")
-    public ResponseEntity<ResponseMyRoommateInfoDto> getMyRoommate(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<ResponseMyRoommateInfoDto> getMyRoommate(@AuthenticationPrincipal CustomUserDetails userDetails, HttpServletRequest request) {
         Long userId = userDetails.getId();
-        ResponseMyRoommateInfoDto response = myRoommateService.getMyRoommateInfo(userId);
+        ResponseMyRoommateInfoDto response = myRoommateService.getMyRoommateInfo(userId, request);
         return ResponseEntity.ok(response);
     }
 
