@@ -14,7 +14,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-stomp")
                 .setAllowedOrigins("http://localhost:5173", "https://inu-dormitory.inuappcenter.kr", "https://inu-dormitory-dev.inuappcenter.kr")
-                .setAllowedCredentials(true)
                 .withSockJS();
     }
 
