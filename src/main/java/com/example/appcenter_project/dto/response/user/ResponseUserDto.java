@@ -14,6 +14,7 @@ public class ResponseUserDto {
     private String college;
     private int penalty;
     private boolean isRoommateCheckList = false;
+    private boolean hasTimeTableImage = false;
 
     public static ResponseUserDto entityToDto(User user) {
         return ResponseUserDto.builder()
@@ -22,6 +23,7 @@ public class ResponseUserDto {
                 .dormType(user.getDormType() != null ? user.getDormType().toValue() : "")
                 .college(user.getCollege() != null ? user.getCollege().toValue() : "")
                 .penalty(user.getPenalty())
+                .hasTimeTableImage(user.getTimeTableImage() != null)
                 .build();
     }
 
@@ -33,6 +35,7 @@ public class ResponseUserDto {
                 .college(user.getCollege() != null ? user.getCollege().toValue() : "")
                 .penalty(user.getPenalty())
                 .isRoommateCheckList(checkList)
+                .hasTimeTableImage(user.getTimeTableImage() != null)
                 .build();
     }
 }

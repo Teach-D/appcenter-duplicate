@@ -107,6 +107,33 @@ public class UserController implements UserApiSpecification {
         return ResponseEntity.status(OK).build();
     }
 
+    @PutMapping(value = "/time-table-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> updateUserTimeTableImage(@AuthenticationPrincipal CustomUserDetails user, @RequestPart MultipartFile image) {
+        imageService.updateUserTimeTableImage(user.getId(), image);
+        return ResponseEntity.status(OK).build();
+    }
+
+    @GetMapping("/time-table-image")
+    public ResponseEntity<ImageLinkDto> findUserTimeTableImageByUserId(
+            @AuthenticationPrincipal CustomUserDetails user,
+            HttpServletRequest request) {
+        try {
+            ImageLinkDto imageLinkDto = imageService.findUserTimeTableImageUrlByUserId(user.getId(), request);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                    .body(imageLinkDto);
+        } catch (Exception e) {
+            log.error("Error retrieving user timetable image: ", e);
+            throw e;
+        }
+    }
+
+    @DeleteMapping("/time-table-image")
+    public ResponseEntity<Void> deleteUserTimeTableImage(@AuthenticationPrincipal CustomUserDetails user) {
+        imageService.deleteUserTimeTableImage(user.getId());
+        return ResponseEntity.status(NO_CONTENT).build();
+    }
+
     @DeleteMapping
     public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal CustomUserDetails user) {
         userService.deleteUser(user.getId());

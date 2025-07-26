@@ -165,6 +165,66 @@ public interface UserApiSpecification {
             @Parameter(description = "업로드할 이미지 파일", required = true) MultipartFile image);
 
     @Operation(
+            summary = "사용자 시간표 이미지 업로드/수정",
+            description = "현재 로그인한 사용자의 시간표 이미지를 업로드하거나 수정합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "시간표 이미지 저장/수정 성공"),
+                    @ApiResponse(responseCode = "400", description = "잘못된 이미지 파일입니다.", content = @Content(examples = {})),
+                    @ApiResponse(responseCode = "403", description = "인증되지 않은 사용자입니다.", content = @Content(examples = {})),
+                    @ApiResponse(responseCode = "404",
+                            description = """
+                            다음 중 하나일 수 있습니다:
+                            - 사용자를 찾을 수 없습니다. (USER_NOT_FOUND)
+                            - 이미지를 찾을 수 없습니다. (IMAGE_NOT_FOUND)
+                            """,
+                            content = @Content(examples = {})
+                    )
+            }
+    )
+    ResponseEntity<Void> updateUserTimeTableImage(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestPart
+            @Parameter(description = "업로드할 시간표 이미지 파일", required = true) MultipartFile image);
+
+    @Operation(
+            summary = "사용자 시간표 이미지 조회",
+            description = "현재 로그인한 사용자의 시간표 이미지를 조회합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "시간표 이미지 조회 성공",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ImageLinkDto.class))),
+                    @ApiResponse(responseCode = "403", description = "인증되지 않은 사용자입니다.", content = @Content(examples = {})),
+                    @ApiResponse(responseCode = "404",
+                            description = """
+                            다음 중 하나일 수 있습니다:
+                            - 사용자를 찾을 수 없습니다. (USER_NOT_FOUND)
+                            - 시간표 이미지를 찾을 수 없습니다. (IMAGE_NOT_FOUND)
+                            """,
+                            content = @Content(examples = {})
+                    )
+            }
+    )
+    ResponseEntity<ImageLinkDto> findUserTimeTableImageByUserId(@AuthenticationPrincipal CustomUserDetails user, HttpServletRequest request);
+
+    @Operation(
+            summary = "사용자 시간표 이미지 삭제",
+            description = "현재 로그인한 사용자의 시간표 이미지를 삭제합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "시간표 이미지 삭제 성공"),
+                    @ApiResponse(responseCode = "403", description = "인증되지 않은 사용자입니다.", content = @Content(examples = {})),
+                    @ApiResponse(responseCode = "404",
+                            description = """
+                            다음 중 하나일 수 있습니다:
+                            - 사용자를 찾을 수 없습니다. (USER_NOT_FOUND)
+                            - 시간표 이미지를 찾을 수 없습니다. (IMAGE_NOT_FOUND)
+                            """,
+                            content = @Content(examples = {})
+                    )
+            }
+    )
+    ResponseEntity<Void> deleteUserTimeTableImage(@AuthenticationPrincipal CustomUserDetails user);
+
+    @Operation(
             summary = "사용자 탈퇴",
             description = "현재 로그인한 사용자의 계정을 삭제합니다.",
             responses = {
