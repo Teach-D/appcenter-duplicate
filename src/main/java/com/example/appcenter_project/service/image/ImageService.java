@@ -115,8 +115,9 @@ public class ImageService {
 
         // 이미 user의 이미지가 defaultImage인 경우
         if (file != null && user.getImage().getIsDefault()) {
-            // 운영 환경에 맞는 경로 설정
-            String imagePath = "/app/images/user/";
+            // 개발 환경에 맞는 경로 설정
+            String basePath = System.getProperty("user.dir");
+            String imagePath = basePath + "/images/user/";
 
             // 파일 확장자 추출
             String fileExtension = getFileExtension(file.getOriginalFilename());
@@ -137,7 +138,7 @@ public class ImageService {
 
                 // 이미지 객체 생성 후 저장
                 Image image = Image.builder()
-                        .filePath(imagePath + imageFileName)
+                        .filePath(destinationFile.getAbsolutePath())
                         .isDefault(false)
                         .imageType(ImageType.USER)
                         .build();
@@ -161,7 +162,8 @@ public class ImageService {
             }
 
             // 새 파일 경로 설정
-            String imagePath = "/app/images/user/";
+            String basePath = System.getProperty("user.dir");
+            String imagePath = basePath + "/images/user/";
             String fileExtension = getFileExtension(file.getOriginalFilename());
             String imageFileName = "user_" + userId + fileExtension;
 
@@ -175,7 +177,7 @@ public class ImageService {
 
             Image image = imageRepository.findByFilePath(oldFilePath)
                     .orElseThrow(() -> new CustomException(IMAGE_NOT_FOUND));
-            image.updateFilePath(imagePath + imageFileName);
+            image.updateFilePath(destinationFile.getAbsolutePath());
 
             try {
                 file.transferTo(destinationFile);
@@ -387,7 +389,147 @@ public class ImageService {
         return baseUrl.toString();
     }
 
-    // 유틸리티: 파일 컨텐츠 타입 확인
+    public void updateUserTimeTableImage(Long userId, MultipartFile file) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        if (file == null || file.isEmpty()) {
+            throw new CustomException(IMAGE_NOT_FOUND);
+        }
+
+        // 기존 시간표 이미지가 있다면 파일 삭제
+        if (user.getTimeTableImage() != null) {
+            String oldFilePath = user.getTimeTableImage().getFilePath();
+            File oldFile = new File(oldFilePath);
+            if (oldFile.exists()) {
+                boolean deleted = oldFile.delete();
+                if (!deleted) {
+                    log.warn("Failed to delete old timetable image file: {}", oldFilePath);
+                }
+            }
+            // 기존 이미지 엔티티 삭제
+            imageRepository.delete(user.getTimeTableImage());
+        }
+
+        // 개발 환경에 맞는 경로 설정 (기존 user 이미지 방식과 동일)
+        String basePath = System.getProperty("user.dir");
+        String imagePath = basePath + "/images/user/timetable/";
+        
+        String fileExtension = getFileExtension(file.getOriginalFilename());
+        String imageFileName = "timetable_user_" + userId + fileExtension;
+
+        // 디렉토리 생성 (존재하지 않으면)
+        File directory = new File(imagePath);
+        if (!directory.exists()) {
+            boolean created = directory.mkdirs();
+            if (!created) {
+                log.error("Failed to create timetable directory: {}", imagePath);
+                throw new CustomException(IMAGE_NOT_FOUND);
+            }
+        }
+
+        File destinationFile = new File(imagePath + imageFileName);
+
+        try {
+            file.transferTo(destinationFile);
+            log.info("Timetable image saved successfully: {}", destinationFile.getAbsolutePath());
+
+            // 이미지 객체 생성 후 저장
+            Image image = Image.builder()
+                    .filePath(destinationFile.getAbsolutePath())
+                    .isDefault(false)
+                    .imageType(ImageType.TIME_TABLE)
+                    .boardId(userId)
+                    .build();
+            imageRepository.save(image);
+
+            // user에 시간표 이미지 연관관계 세팅
+            user.updateTimeTableImage(image);
+
+        } catch (IOException e) {
+            log.error("Failed to save timetable image file for user {}: ", userId, e);
+            throw new CustomException(IMAGE_NOT_FOUND);
+        }
+    }
+
+    public ImageLinkDto findUserTimeTableImageUrlByUserId(Long userId, HttpServletRequest request) {
+        try {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+            Image timeTableImage = user.getTimeTableImage();
+            if (timeTableImage == null) {
+                throw new CustomException(ErrorCode.IMAGE_NOT_FOUND);
+            }
+
+            // 파일 존재 확인
+            File file = new File(timeTableImage.getFilePath());
+            log.info("Checking timetable file: {}", timeTableImage.getFilePath());
+            log.info("File exists: {}", file.exists());
+
+            if (!file.exists()) {
+                log.error("Timetable image file not found: {}", timeTableImage.getFilePath());
+                throw new CustomException(ErrorCode.IMAGE_NOT_FOUND);
+            }
+
+            // 이미지 URL 생성
+            String baseUrl = getBaseUrl(request);
+            String imageUrl = baseUrl + "/api/images/timetable/" + timeTableImage.getId();
+
+            // 정적 리소스 URL 생성
+            String staticImageUrl = getStaticTimeTableImageUrl(timeTableImage.getFilePath(), baseUrl);
+
+            // 안전한 컨텐츠 타입 확인
+            String contentType = getSafeContentType(file);
+
+            return ImageLinkDto.builder()
+                    .imageUrl(imageUrl)
+                    .fileName(staticImageUrl)
+                    .contentType(contentType)
+                    .fileSize(file.length())
+                    .build();
+        } catch (Exception e) {
+            log.error("Error in findUserTimeTableImageUrlByUserId: ", e);
+            throw e;
+        }
+    }
+
+    public void deleteUserTimeTableImage(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        Image timeTableImage = user.getTimeTableImage();
+        if (timeTableImage == null) {
+            throw new CustomException(IMAGE_NOT_FOUND);
+        }
+
+        // 파일 삭제
+        String filePath = timeTableImage.getFilePath();
+        File file = new File(filePath);
+        if (file.exists()) {
+            boolean deleted = file.delete();
+            if (!deleted) {
+                log.warn("Failed to delete timetable image file: {}", filePath);
+            }
+        }
+
+        // 데이터베이스에서 이미지 엔티티 삭제
+        imageRepository.delete(timeTableImage);
+
+        // 사용자 엔티티에서 시간표 이미지 참조 제거
+        user.removeTimeTableImage();
+    }
+
+    // 정적 시간표 이미지 URL 생성 헬퍼 메소드
+    private String getStaticTimeTableImageUrl(String filePath, String baseUrl) {
+        try {
+            String fileName = Paths.get(filePath).getFileName().toString();
+            return baseUrl + "/images/user/timetable/" + fileName;
+        } catch (Exception e) {
+            log.warn("Could not generate static URL for timetable path: {}", filePath);
+            return null;
+        }
+    }
     private String getContentType(File file) {
         try {
             String contentType = Files.probeContentType(file.toPath());

@@ -60,6 +60,10 @@ public class User extends BaseTimeEntity {
     @JoinColumn(name = "image_id")
     private Image image;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "time_table_image_id")
+    private Image timeTableImage;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Tip> tipList = new ArrayList<>();
 
@@ -105,6 +109,14 @@ public class User extends BaseTimeEntity {
 
     public void updateImage(Image image) {
         this.image =image;
+    }
+
+    public void updateTimeTableImage(Image timeTableImage) {
+        this.timeTableImage = timeTableImage;
+    }
+
+    public void removeTimeTableImage() {
+        this.timeTableImage = null;
     }
 
     public void addTip(Tip tip) {

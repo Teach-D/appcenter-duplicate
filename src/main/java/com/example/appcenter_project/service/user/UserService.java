@@ -79,7 +79,12 @@ public class UserService {
     public ResponseUserDto findUserByUserId(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        return ResponseUserDto.entityToDto(user);
+
+        if (user.getRoommateCheckList() == null) {
+            return ResponseUserDto.entityToDto(user, false);
+        }
+
+        return ResponseUserDto.entityToDto(user, true);
     }
 
     public ResponseUserDto updateUser(Long userId, RequestUserDto requestUserDto) {
