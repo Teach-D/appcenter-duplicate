@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/ws-stomp", "/health").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**").permitAll()
                         .requestMatchers("/users", "/users/refreshToken").permitAll()
                         .requestMatchers(GET, "/tips/**", "/group-orders/**", "/roommates/**").permitAll()
