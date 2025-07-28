@@ -16,6 +16,9 @@ public class CorsConfig {
     @Value("${app.urls.development}")
     private String developmentUrl;
 
+    @Value("${app.urls.frontend}")
+    private String frontendUrl;
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -26,9 +29,14 @@ public class CorsConfig {
         configuration.addAllowedOriginPattern("https://localhost:*");
         configuration.addAllowedOrigin(productionUrl);
         configuration.addAllowedOrigin(developmentUrl);
+        configuration.addAllowedOrigin(frontendUrl);
         
+        // 모든 헤더와 메서드 허용
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
+        
+        // 프리플라이트 요청 캐시 시간 설정 (1시간)
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
