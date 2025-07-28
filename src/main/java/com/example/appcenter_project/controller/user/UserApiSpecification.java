@@ -1,6 +1,7 @@
 package com.example.appcenter_project.controller.user;
 
 import com.example.appcenter_project.dto.ImageLinkDto;
+import com.example.appcenter_project.dto.request.user.RequestTokenDto;
 import com.example.appcenter_project.dto.request.user.RequestUserDto;
 import com.example.appcenter_project.dto.request.user.SignupUser;
 import com.example.appcenter_project.dto.response.user.ResponseBoardDto;
@@ -63,9 +64,9 @@ public interface UserApiSpecification {
             }
     )
     ResponseEntity<?> reissueAccessToken(
-            @RequestHeader("Authorization")
-            @Parameter(description = "Bearer {refreshToken} 형식의 리프레시 토큰", required = true,
-                    example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...") String authorizationHeader);
+            @RequestBody
+            @Parameter RequestTokenDto requestTokenDto
+    );
 
     @Operation(
             summary = "사용자 정보 조회",

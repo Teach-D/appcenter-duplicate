@@ -2,6 +2,7 @@ package com.example.appcenter_project.controller.user;
 
 import com.example.appcenter_project.dto.ImageDto;
 import com.example.appcenter_project.dto.ImageLinkDto;
+import com.example.appcenter_project.dto.request.user.RequestTokenDto;
 import com.example.appcenter_project.dto.request.user.RequestUserDto;
 import com.example.appcenter_project.dto.request.user.SignupUser;
 import com.example.appcenter_project.dto.response.like.ResponseLikeDto;
@@ -45,9 +46,9 @@ public class UserController implements UserApiSpecification {
     }
 
     @PostMapping("/refreshToken")
-    public ResponseEntity<?> reissueAccessToken(@RequestHeader("Authorization") String authorizationHeader) {
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String refreshToken = authorizationHeader.substring(7);
+    public ResponseEntity<?> reissueAccessToken(@RequestBody RequestTokenDto requestTokenDto) {
+        if (requestTokenDto.getRefreshToken() != null && requestTokenDto.getRefreshToken().startsWith("Bearer ")) {
+            String refreshToken = requestTokenDto.getRefreshToken().substring(7);
             String newAccessToken = userService.reissueAccessToken(refreshToken);
             return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
         }

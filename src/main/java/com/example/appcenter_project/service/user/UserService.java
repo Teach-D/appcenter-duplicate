@@ -151,7 +151,7 @@ public class UserService {
         if (!jwtTokenProvider.validateRefreshToken(refreshToken)) {
             throw new CustomException(INVALID_REFRESH_TOKEN);
         }
-
+        log.info("refreshToken: {}", refreshToken);
         User user = userRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(() -> new CustomException(REFRESH_TOKEN_USER_NOT_FOUND));
 
