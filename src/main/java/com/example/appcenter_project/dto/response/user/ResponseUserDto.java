@@ -8,6 +8,7 @@ import lombok.Getter;
 @Builder
 public class ResponseUserDto {
 
+    private Long id;
     private String name;
     private String studentNumber;
     private String dormType;
@@ -18,6 +19,7 @@ public class ResponseUserDto {
 
     public static ResponseUserDto entityToDto(User user) {
         return ResponseUserDto.builder()
+                .id(user.getId())
                 .name(user.getName() != null ? user.getName() : "")
                 .studentNumber(user.getStudentNumber())
                 .dormType(user.getDormType() != null ? user.getDormType().toValue() : "")
@@ -29,6 +31,7 @@ public class ResponseUserDto {
 
     public static ResponseUserDto entityToDto(User user, boolean checkList) {
         return ResponseUserDto.builder()
+                .id(user.getId())
                 .name(user.getName() != null ? user.getName() : "")
                 .studentNumber(user.getStudentNumber())
                 .dormType(user.getDormType() != null ? user.getDormType().toValue() : "")
