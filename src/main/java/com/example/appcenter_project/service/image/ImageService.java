@@ -530,6 +530,122 @@ public class ImageService {
             return null;
         }
     }
+
+    // Tip 이미지 업데이트
+    public void updateTipImage(Long tipId, MultipartFile file) {
+        // Tip 엔티티 조회는 TipService에서 하도록 수정할 수도 있지만, 
+        // 일단 여기서는 tipId만으로 이미지를 관리하는 방식으로 구현
+        
+        if (file == null || file.isEmpty()) {
+            throw new CustomException(IMAGE_NOT_FOUND);
+        }
+
+        // 개발 환경에 맞는 경로 설정
+        String basePath = System.getProperty("user.dir");
+        String imagePath = basePath + "/images/tip/";
+        
+        String fileExtension = getFileExtension(file.getOriginalFilename());
+        String imageFileName = "tip_" + tipId + "_" + UUID.randomUUID() + fileExtension;
+
+        // 디렉토리 생성 (존재하지 않으면)
+        File directory = new File(imagePath);
+        if (!directory.exists()) {
+            boolean created = directory.mkdirs();
+            if (!created) {
+                log.error("Failed to create tip image directory: {}", imagePath);
+                throw new CustomException(IMAGE_NOT_FOUND);
+            }
+        }
+
+        File destinationFile = new File(imagePath + imageFileName);
+
+        try {
+            file.transferTo(destinationFile);
+            log.info("Tip image saved successfully: {}", destinationFile.getAbsolutePath());
+
+            // 이미지 객체 생성 후 저장
+            Image image = Image.builder()
+                    .filePath(destinationFile.getAbsolutePath())
+                    .isDefault(false)
+                    .imageType(ImageType.TIP)
+                    .boardId(tipId)
+                    .build();
+            imageRepository.save(image);
+
+        } catch (IOException e) {
+            log.error("Failed to save tip image file for tip {}: ", tipId, e);
+            throw new CustomException(IMAGE_NOT_FOUND);
+        }
+    }
+
+    // Tip 이미지 URL 조회
+    public ImageLinkDto findTipImageUrlByTipId(Long tipId, HttpServletRequest request) {
+        try {
+            // boardId와 imageType으로 이미지 조회
+            Image tipImage = imageRepository.findByBoardIdAndImageType(tipId, ImageType.TIP)
+                    .orElseThrow(() -> new CustomException(ErrorCode.IMAGE_NOT_FOUND));
+
+            // 파일 존재 확인
+            File file = new File(tipImage.getFilePath());
+            log.info("Checking tip image file: {}", tipImage.getFilePath());
+            log.info("File exists: {}", file.exists());
+
+            if (!file.exists()) {
+                log.error("Tip image file not found: {}", tipImage.getFilePath());
+                throw new CustomException(ErrorCode.IMAGE_NOT_FOUND);
+            }
+
+            // 이미지 URL 생성
+            String baseUrl = getBaseUrl(request);
+            String imageUrl = baseUrl + "/api/images/tip/" + tipImage.getId();
+
+            // 정적 리소스 URL 생성
+            String staticImageUrl = getStaticTipImageUrl(tipImage.getFilePath(), baseUrl);
+
+            // 안전한 컨텐츠 타입 확인
+            String contentType = getSafeContentType(file);
+
+            return ImageLinkDto.builder()
+                    .imageUrl(imageUrl)
+                    .fileName(staticImageUrl)
+                    .contentType(contentType)
+                    .fileSize(file.length())
+                    .build();
+        } catch (Exception e) {
+            log.error("Error in findTipImageUrlByTipId: ", e);
+            throw e;
+        }
+    }
+
+    // Tip 이미지 삭제
+    public void deleteTipImage(Long tipId) {
+        Image tipImage = imageRepository.findByBoardIdAndImageType(tipId, ImageType.TIP)
+                .orElseThrow(() -> new CustomException(IMAGE_NOT_FOUND));
+
+        // 파일 삭제
+        String filePath = tipImage.getFilePath();
+        File file = new File(filePath);
+        if (file.exists()) {
+            boolean deleted = file.delete();
+            if (!deleted) {
+                log.warn("Failed to delete tip image file: {}", filePath);
+            }
+        }
+
+        // 데이터베이스에서 이미지 엔티티 삭제
+        imageRepository.delete(tipImage);
+    }
+
+    // 정적 Tip 이미지 URL 생성 헬퍼 메소드
+    private String getStaticTipImageUrl(String filePath, String baseUrl) {
+        try {
+            String fileName = Paths.get(filePath).getFileName().toString();
+            return baseUrl + "/images/tip/" + fileName;
+        } catch (Exception e) {
+            log.warn("Could not generate static URL for tip image path: {}", filePath);
+            return null;
+        }
+    }
     private String getContentType(File file) {
         try {
             String contentType = Files.probeContentType(file.toPath());
