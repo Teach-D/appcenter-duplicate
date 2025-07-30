@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -388,12 +389,14 @@ public class TipService {
             File file = new File(image.getFilePath());
             if (file.exists()) {
                 String imageUrl = baseUrl + "/api/images/tip/" + image.getId();
-                String fileName = file.getName();
+                
+                // 정적 리소스 URL 생성 (User와 동일한 방식)
+                String staticImageUrl = getStaticTipImageUrl(image.getFilePath(), baseUrl);
                 String contentType = getSafeContentType(file);
 
                 ImageLinkDto imageLinkDto = ImageLinkDto.builder()
                         .imageUrl(imageUrl)
-                        .fileName(fileName)
+                        .fileName(staticImageUrl)  // 정적 리소스로 직접 접근 가능한 URL
                         .contentType(contentType)
                         .fileSize(file.length())
                         .build();
@@ -406,6 +409,17 @@ public class TipService {
 
         log.info("Found {} valid images for tip {}", imageLinkDtos.size(), tipId);
         return imageLinkDtos;
+    }
+
+    // 정적 Tip 이미지 URL 생성 헬퍼 메소드
+    private String getStaticTipImageUrl(String filePath, String baseUrl) {
+        try {
+            String fileName = Paths.get(filePath).getFileName().toString();
+            return baseUrl + "/images/tip/" + fileName;
+        } catch (Exception e) {
+            log.warn("Could not generate static URL for tip image path: {}", filePath);
+            return null;
+        }
     }
 
     // BaseURL 생성 헬퍼 메서드
