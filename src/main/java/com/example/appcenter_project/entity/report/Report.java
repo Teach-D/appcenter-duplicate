@@ -20,7 +20,7 @@ public class Report extends BaseTimeEntity {
     private String title;
     private String content;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
