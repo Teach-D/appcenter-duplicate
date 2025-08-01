@@ -1,5 +1,6 @@
 package com.example.appcenter_project.service.roommate;
 
+import com.example.appcenter_project.dto.ImageLinkDto;
 import com.example.appcenter_project.dto.response.roommate.ResponseMyRoommateInfoDto;
 import com.example.appcenter_project.dto.response.roommate.ResponseRuleDto;
 import com.example.appcenter_project.entity.roommate.MyRoommate;
@@ -78,5 +79,13 @@ public class MyRoommateService {
         myRoommate.updateRules(rules);
     }
 
+    @Transactional
+    public ImageLinkDto findMyRoommateImageByUserId(Long userId, HttpServletRequest request) {
+        MyRoommate myRoommate = myRoommateRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(MY_ROOMMATE_NOT_REGISTERED));
+        Long myRoommateId = myRoommate.getRoommate().getId();
 
+        ImageLinkDto imageLinkDto = imageService.findUserTimeTableImageUrlByUserId(myRoommateId, request);
+        return imageLinkDto;
+    }
 }
