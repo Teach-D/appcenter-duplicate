@@ -5,6 +5,6 @@ import lombok.Getter;
 @Getter
 public class RequestAdminDto {
 
-    String studentNumber;
-    String password;
+    private String studentNumber;
+    private String password;
 }
