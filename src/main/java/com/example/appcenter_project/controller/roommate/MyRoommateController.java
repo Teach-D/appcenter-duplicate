@@ -31,7 +31,7 @@ public class MyRoommateController implements MyRoommateApiSpecification {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/image")
+    @GetMapping("/time-table-image")
     public ResponseEntity<ImageLinkDto> findMyRoommateImageByUserId(
             @AuthenticationPrincipal CustomUserDetails user,
             HttpServletRequest request) {
