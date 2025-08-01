@@ -63,6 +63,27 @@ public interface TipApiSpecification {
     public ResponseEntity<List<ResponseTipDto>> findAllTips();
 
     @Operation(
+            summary = "일일 랜덤 팁 게시글 3개 조회",
+            description = "하루 동안 고정된 랜덤 팁 게시글 3개를 조회합니다. 매일 자정에 새로운 3개의 팁이 선정됩니다.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "일일 랜덤 팁 게시글 조회 성공",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = ResponseTipDto.class))
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "204",
+                            description = "등록된 팁 게시글이 3개 미만입니다.",
+                            content = @Content(examples = {})
+                    )
+            }
+    )
+    public ResponseEntity<List<ResponseTipDto>> findDailyRandomTips();
+
+    @Operation(
             summary = "특정 팁 게시글 상세 조회",
             description = "팁 게시글 ID로 특정 팁 게시글의 상세 정보를 조회합니다. (이미지 제외)",
             responses = {

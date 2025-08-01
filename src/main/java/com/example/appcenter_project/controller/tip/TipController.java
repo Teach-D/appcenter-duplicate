@@ -48,12 +48,21 @@ public class TipController implements TipApiSpecification {
         return ResponseEntity.status(OK).body(tipService.findAllTips());
     }
 
+    // 일일 랜덤 Tip 3개 조회
+    @GetMapping("/daily-random")
+    public ResponseEntity<List<ResponseTipDto>> findDailyRandomTips() {
+        List<ResponseTipDto> dailyRandomTips = tipService.findDailyRandomTips();
+        if (dailyRandomTips.isEmpty()) {
+            return ResponseEntity.status(NO_CONTENT).build();
+        }
+        return ResponseEntity.status(OK).body(dailyRandomTips);
+    }
+
     // 2. 특정 Tip의 이미지를 제외한 정보 하나 조회
     @GetMapping("/{tipId}")
     public ResponseEntity<ResponseTipDetailDto> findTip(@PathVariable Long tipId) {
         return ResponseEntity.status(OK).body(tipService.findTip(tipId));
     }
-
 /*    // 3. 특정 Tip의 이미지 메타 정보 목록 조회
     @GetMapping("/{tipId}/images")
     public ResponseEntity<List<TipImageDto>> getTipImages(@PathVariable Long tipId) {

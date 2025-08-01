@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -252,6 +253,40 @@ public class TipService {
         }
 
         return responseTipDtoList;*/
+    }
+
+    /**
+     * 하루 동안 고정된 랜덤 Tip 3개를 조회합니다.
+     * 날짜를 기준으로 시드값을 생성하여 같은 날에는 항상 같은 3개의 Tip이 반환됩니다.
+     * 
+     * @return 일일 랜덤 Tip 3개 목록
+     */
+    public List<ResponseTipDto> findDailyRandomTips() {
+        List<ResponseTipDto> allTips = tipMapper.findTips();
+        
+        // Tip이 3개 미만인 경우 빈 리스트 반환
+        if (allTips.size() < 3) {
+            log.info("Available tips count: {}. Need at least 3 tips for daily random selection.", allTips.size());
+            return new ArrayList<>();
+        }
+        
+        // 현재 날짜를 기준으로 시드값 생성 (YYYY-MM-DD 형태)
+        java.time.LocalDate today = java.time.LocalDate.now();
+        long seed = today.toEpochDay(); // 1970-01-01부터의 일수를 시드로 사용
+        
+        Random random = new Random(seed);
+        
+        // 전체 Tip 목록을 복사하여 섞기
+        List<ResponseTipDto> shuffledTips = new ArrayList<>(allTips);
+        Collections.shuffle(shuffledTips, random);
+        
+        // 첫 3개 선택
+        List<ResponseTipDto> dailyRandomTips = shuffledTips.subList(0, 3);
+        
+        log.info("Daily random tips selected for date {}: {} tips selected from {} total tips", 
+                today, dailyRandomTips.size(), allTips.size());
+        
+        return dailyRandomTips;
     }
 
     // 하나의 tip 게시판에 있는 모든 tip 댓글 조회
@@ -509,6 +544,4 @@ public class TipService {
         
         log.info("Successfully deleted {} images for tip {}", tipImages.size(), tipId);
     }
-
-
 }
