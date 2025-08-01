@@ -116,12 +116,26 @@ public class RoommateChattingRoomService {
             String lastMessage = lastChat.map(RoommateChattingChat::getContent).orElse("");
             LocalDateTime lastMessageTime = lastChat.map(RoommateChattingChat::getCreatedDate).orElse(null);
 
+            // 상대방 정보 획득
+            User partner = null;
+
+            User host = room.getHost();
+            User guest = room.getGuest();
+
+            if (host.getId().equals(user.getId())) {
+                partner = guest;
+            } else {
+                partner = host;
+            }
+
             // DTO 생성
             result.add(ResponseRoommateChatRoomDto.builder()
                     .chatRoomId(room.getId())
                     .opponentNickname(opponentNickname)
                     .lastMessage(lastMessage)
                     .lastMessageTime(lastMessageTime)
+                    .partnerName(partner.getName())
+                    .partnerId(partner.getId())
                     .build());
         }
 
