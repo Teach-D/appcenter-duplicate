@@ -46,6 +46,8 @@ public class SecurityConfig {
                         // 이미지 관련 엔드포인트 모두 허용
                         .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/static/**").permitAll()
+                        .requestMatchers(GET, "/reports/**").hasRole("ADMIN")
+                        .requestMatchers(DELETE, "/reports/**").hasRole("ADMIN")
                         .requestMatchers("/**").hasRole("USER")
                         .anyRequest().authenticated())
                 .sessionManagement(sessionManagement ->
