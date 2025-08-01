@@ -292,6 +292,7 @@ public class ImageService {
 
             // 정적 리소스 URL 생성 (직접 접근 가능)
             String staticImageUrl = getStaticImageUrl(image.getFilePath(), baseUrl);
+            String changeUrl = staticImageUrl.replace("http", "https");
 
             // 안전한 컨텐츠 타입 확인
             String contentType = getSafeContentType(file);
@@ -299,9 +300,10 @@ public class ImageService {
             // 실제 파일명 추출 (경로에서 파일명만)
             String actualFileName = Paths.get(image.getFilePath()).getFileName().toString();
 
+
             return ImageLinkDto.builder()
                     .imageUrl(imageUrl)
-                    .fileName(staticImageUrl)  // 정적 리소스로 직접 접근 가능한 URL
+                    .fileName(changeUrl)  // 정적 리소스로 직접 접근 가능한 URL
                     .contentType(contentType)
                     .fileSize(file.length())
                     .build();
@@ -478,13 +480,14 @@ public class ImageService {
 
             // 정적 리소스 URL 생성
             String staticImageUrl = getStaticTimeTableImageUrl(timeTableImage.getFilePath(), baseUrl);
+            String changeUrl = staticImageUrl.replace("http", "https");
 
             // 안전한 컨텐츠 타입 확인
             String contentType = getSafeContentType(file);
 
             return ImageLinkDto.builder()
                     .imageUrl(imageUrl)
-                    .fileName(staticImageUrl)
+                    .fileName(changeUrl)
                     .contentType(contentType)
                     .fileSize(file.length())
                     .build();

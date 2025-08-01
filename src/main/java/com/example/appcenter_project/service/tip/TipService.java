@@ -392,11 +392,13 @@ public class TipService {
                 
                 // 정적 리소스 URL 생성 (User와 동일한 방식)
                 String staticImageUrl = getStaticTipImageUrl(image.getFilePath(), baseUrl);
+                String changeUrl = staticImageUrl.replace("http", "https");
+
                 String contentType = getSafeContentType(file);
 
                 ImageLinkDto imageLinkDto = ImageLinkDto.builder()
                         .imageUrl(imageUrl)
-                        .fileName(staticImageUrl)  // 정적 리소스로 직접 접근 가능한 URL
+                        .fileName(changeUrl)  // 정적 리소스로 직접 접근 가능한 URL
                         .contentType(contentType)
                         .fileSize(file.length())
                         .build();
