@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -122,8 +123,10 @@ public class ImageService {
             // 파일 확장자 추출
             String fileExtension = getFileExtension(file.getOriginalFilename());
 
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
             // 사용자별 고유 파일명 생성 (user_${userId}.확장자)
-            String imageFileName = "user_" + userId + fileExtension;
+            String imageFileName = "user_" + userId + fileExtension + timestamp.getTime();
 
             // 디렉토리 생성 (존재하지 않으면)
             File directory = new File(imagePath);
@@ -164,8 +167,10 @@ public class ImageService {
             // 새 파일 경로 설정
             String basePath = System.getProperty("user.dir");
             String imagePath = basePath + "/images/user/";
+
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             String fileExtension = getFileExtension(file.getOriginalFilename());
-            String imageFileName = "user_" + userId + fileExtension;
+            String imageFileName = "user_" + userId + fileExtension + timestamp;
 
             // 디렉토리 생성 (존재하지 않으면)
             File directory = new File(imagePath);

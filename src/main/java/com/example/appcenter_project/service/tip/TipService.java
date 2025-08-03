@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -129,9 +130,10 @@ public class TipService {
                     continue;
                 }
 
+                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                 String fileExtension = getFileExtension(file.getOriginalFilename());
                 String uuid = UUID.randomUUID().toString();
-                String imageFileName = "tip_" + tip.getId() + "_" + uuid + fileExtension;
+                String imageFileName = "tip_" + tip.getId() + "_" + uuid + fileExtension + timestamp;
                 File destinationFile = new File(imagePath + imageFileName);
 
                 try {
