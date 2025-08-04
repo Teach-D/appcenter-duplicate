@@ -22,20 +22,23 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Value("${app.urls.development}")
     private String developmentUrl;
 
-    @Value("${app.urls.frontend}")
-    private String frontendUrl;
+    @Value("${app.urls.frontend-dev-url}")
+    private String frontDevUrl;
+
+    @Value("${app.urls.frontend-main-url}")
+    private String frontMainUrl;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-stomp")
-                .setAllowedOriginPatterns("http://localhost:*", "https://localhost:*", frontendUrl)
-                .setAllowedOrigins(productionUrl, developmentUrl, frontendUrl);
+                .setAllowedOriginPatterns("http://localhost:*", "https://localhost:*", frontDevUrl, frontMainUrl)
+                .setAllowedOrigins(productionUrl, developmentUrl, frontDevUrl, frontMainUrl);
                 // .withSockJS(); // SockJS 제거하여 순수 WebSocket 허용
                 
         // SockJS도 함께 지원하려면 별도 엔드포인트 추가
         registry.addEndpoint("/ws-stomp-sockjs")
-                .setAllowedOriginPatterns("http://localhost:*", "https://localhost:*", frontendUrl)
-                .setAllowedOrigins(productionUrl, developmentUrl, frontendUrl)
+                .setAllowedOriginPatterns("http://localhost:*", "https://localhost:*", frontDevUrl, frontMainUrl)
+                .setAllowedOrigins(productionUrl, developmentUrl, frontDevUrl, frontMainUrl)
                 .withSockJS();
     }
 

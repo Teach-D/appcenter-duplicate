@@ -16,8 +16,11 @@ public class CorsConfig {
     @Value("${app.urls.development}")
     private String developmentUrl;
 
-    @Value("${app.urls.frontend}")
-    private String frontendUrl;
+    @Value("${app.urls.frontend-dev-url}")
+    private String frontDevUrl;
+
+    @Value("${app.urls.frontend-main-url}")
+    private String frontMainUrl;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -29,8 +32,9 @@ public class CorsConfig {
         configuration.addAllowedOriginPattern("https://localhost:*");
         configuration.addAllowedOrigin(productionUrl);
         configuration.addAllowedOrigin(developmentUrl);
-        configuration.addAllowedOrigin(frontendUrl);
-        
+        configuration.addAllowedOrigin(frontDevUrl);
+        configuration.addAllowedOrigin(frontMainUrl);
+
         // 모든 헤더와 메서드 허용
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
