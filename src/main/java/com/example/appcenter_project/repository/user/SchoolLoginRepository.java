@@ -16,7 +16,7 @@ public class SchoolLoginRepository {
     @Qualifier("oracleJdbc")
     private JdbcTemplate jdbcTemplate;
 
-    public void loginCheck(String username, String password) {
+    public boolean loginCheck(String username, String password) {
         String sql = "SELECT F_LOGIN_CHECK(?,?) FROM DUAL";
         log.info("학교 로그인 조회 id:{}",username);
         try {
@@ -25,9 +25,10 @@ public class SchoolLoginRepository {
 
             String result = jdbcTemplate.queryForObject(sql, String.class,username,password);
             log.info("학교 디비 조회 결과 : {}",result);
+            return true;
         } catch (Exception e) {
             log.info("데이터베이스 연결 오류 메시지 : {}",e.getMessage());
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+            return false;
         }
     }
 }
