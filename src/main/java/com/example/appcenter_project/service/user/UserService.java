@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import static com.example.appcenter_project.exception.ErrorCode.*;
 
@@ -103,9 +104,9 @@ public class UserService {
     }
 
     public ResponseLoginDto login(SignupUser signupUser) {
-        boolean loginCheck = schoolLoginRepository.loginCheck(signupUser.getStudentNumber(), signupUser.getPassword());
+        String loginCheck = schoolLoginRepository.loginCheck(signupUser.getStudentNumber(), signupUser.getPassword());
 
-        if (!loginCheck) {
+        if (Objects.equals(loginCheck, "N")) {
             throw new CustomException(USER_NOT_FOUND);
         }
 
