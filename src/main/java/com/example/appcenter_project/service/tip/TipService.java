@@ -133,7 +133,7 @@ public class TipService {
                 Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                 String fileExtension = getFileExtension(file.getOriginalFilename());
                 String uuid = UUID.randomUUID().toString();
-                String imageFileName = "tip_" + tip.getId() + "_" + uuid + fileExtension + timestamp;
+                String imageFileName = "tip_" + tip.getId() + "_" + uuid + timestamp + fileExtension;
                 File destinationFile = new File(imagePath + imageFileName);
 
                 try {

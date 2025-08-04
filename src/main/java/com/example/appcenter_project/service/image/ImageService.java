@@ -126,7 +126,7 @@ public class ImageService {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
             // 사용자별 고유 파일명 생성 (user_${userId}.확장자)
-            String imageFileName = "user_" + userId + fileExtension + timestamp.getTime();
+            String imageFileName = "user_" + userId + timestamp.getTime() + fileExtension;
 
             // 디렉토리 생성 (존재하지 않으면)
             File directory = new File(imagePath);
@@ -170,7 +170,7 @@ public class ImageService {
 
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             String fileExtension = getFileExtension(file.getOriginalFilename());
-            String imageFileName = "user_" + userId + fileExtension + timestamp;
+            String imageFileName = "user_" + userId + timestamp.getTime() + fileExtension;
 
             // 디렉토리 생성 (존재하지 않으면)
             File directory = new File(imagePath);
@@ -421,9 +421,10 @@ public class ImageService {
         // 개발 환경에 맞는 경로 설정 (기존 user 이미지 방식과 동일)
         String basePath = System.getProperty("user.dir");
         String imagePath = basePath + "/images/user/timetable/";
-        
+
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         String fileExtension = getFileExtension(file.getOriginalFilename());
-        String imageFileName = "timetable_user_" + userId + fileExtension;
+        String imageFileName = "timetable_user_" + userId + timestamp.getTime() + fileExtension;
 
         // 디렉토리 생성 (존재하지 않으면)
         File directory = new File(imagePath);
