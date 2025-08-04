@@ -12,12 +12,14 @@ import com.example.appcenter_project.repository.roommate.RoommateBoardRepository
 import com.example.appcenter_project.repository.roommate.RoommateCheckListRepository;
 import com.example.appcenter_project.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RoommateService {
@@ -28,6 +30,9 @@ public class RoommateService {
 
     @Transactional
     public ResponseRoommatePostDto createRoommateCheckListandBoard(RequestRoommateFormDto requestDto, Long userId) {
+
+        log.info("createRoommateCheckListandBoard title: {}, userId: {}", requestDto.getTitle(), userId);
+
         // 1. 유저 확인
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOMMATE_USER_NOT_FOUND));
