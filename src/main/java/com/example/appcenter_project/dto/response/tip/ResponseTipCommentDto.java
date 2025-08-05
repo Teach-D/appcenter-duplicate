@@ -22,6 +22,7 @@ public class ResponseTipCommentDto {
     private Long parentId;
     private Boolean isDeleted;
     private LocalDateTime createdDate;
+    private String name;
 
     @Builder.Default
     private List<ResponseTipCommentDto> childTipCommentList = new ArrayList<>();
@@ -31,7 +32,10 @@ public class ResponseTipCommentDto {
                 .tipCommentId(tipComment.getId())
                 .userId(user.getId())
                 .reply(tipComment.getReply())
+                .parentId(tipComment.getParentTipComment() != null ? tipComment.getParentTipComment().getId() : null)
+                .isDeleted(tipComment.isDeleted())
                 .createdDate(tipComment.getCreatedDate())
+                .name(user.getName())
                 .build();
     }
 
