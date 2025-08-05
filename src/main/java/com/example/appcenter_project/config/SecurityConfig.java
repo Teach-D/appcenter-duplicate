@@ -47,6 +47,11 @@ public class SecurityConfig {
                         .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/static/**").permitAll()
                         .requestMatchers("/admins/login").permitAll()
+                        // 공지사항 관련 엔드포인트
+                        .requestMatchers(POST, "/announcements/**").hasRole("ADMIN")
+                        .requestMatchers(PUT, "/announcements/**").hasRole("ADMIN")
+                        .requestMatchers(DELETE, "/announcements/**").hasRole("ADMIN")
+                        .requestMatchers(GET, "/announcements/**").permitAll()
                         .requestMatchers(GET, "/reports/**").hasRole("ADMIN")
                         .requestMatchers(DELETE, "/reports/**").hasRole("ADMIN")
                         .requestMatchers("/**").hasRole("USER")

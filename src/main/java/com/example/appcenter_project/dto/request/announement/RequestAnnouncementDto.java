@@ -1,0 +1,22 @@
+package com.example.appcenter_project.dto.request.announement;
+
+import com.example.appcenter_project.entity.announcement.Announcement;
+import lombok.Getter;
+import org.springframework.web.multipart.MultipartFile;
+
+@Getter
+public class RequestAnnouncementDto {
+
+    private String title;
+    private String writer;
+    private String content;
+
+    public static Announcement dtoToEntity(RequestAnnouncementDto requestAnnouncementDto) {
+        return Announcement.builder()
+                .title(requestAnnouncementDto.getTitle())
+                .writer(requestAnnouncementDto.getWriter())
+                .content(requestAnnouncementDto.getContent())
+                .build();
+    }
+
+}
