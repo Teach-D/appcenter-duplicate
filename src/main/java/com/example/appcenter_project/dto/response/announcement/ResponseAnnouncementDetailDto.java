@@ -33,6 +33,9 @@ public class ResponseAnnouncementDetailDto {
     @Schema(description = "수정일", example = "2025-08-05")
     private LocalDate updatedDate;
 
+    @Schema(description = "긴급", example = "true")
+    private boolean isEmergency;
+
     public static ResponseAnnouncementDetailDto entityToDto(Announcement announcement) {
         return ResponseAnnouncementDetailDto.builder()
                 .id(announcement.getId())
@@ -42,6 +45,7 @@ public class ResponseAnnouncementDetailDto {
                 .viewCount(announcement.getViewCount())
                 .createdDate(announcement.getCreatedDate().toLocalDate())
                 .updatedDate(announcement.getModifiedDate().toLocalDate())
+                .isEmergency(announcement.isEmergency())
                 .build();
     }
 }
