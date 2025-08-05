@@ -60,8 +60,8 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:latest
             
             # 기존 컨테이너 중지 및 제거
-            docker stop ${{ secrets.DOCKER_IMAGE }} || true
-            docker rm ${{ secrets.DOCKER_IMAGE }} || true
+            docker stop ${{ secrets.MAIN_CONTAINER_NAME }} || true
+            docker rm ${{ secrets.MAIN_CONTAINER_NAME }} || true
             
             # Docker Volume 생성 (이미 존재하면 무시됨)
             docker volume create unidorm-images || true
@@ -70,10 +70,10 @@ jobs:
             docker network create unidorm-network || true
             docker network connect unidorm-network unidorm-main-mysql || true
             
-            docker run -d --name ${{ secrets.DOCKER_IMAGE }} \
+            docker run -d --name ${{ secrets.MAIN_CONTAINER_NAME }} \
               --network unidorm-network \
               -p 8056:8080 \
               -v unidorm-images:/app/images \
-              -v unidormuploads:/app/uploads \
+              -v unidorm-uploads:/app/uploads \
               --restart unless-stopped \
               ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:latest
