@@ -73,6 +73,6 @@ jobs:
               --network inu-network \
               -p 8055:8080 \
               -v inu-dormitory-images:/app/images \
-              -v inu-dormitory-uploads:/app/uploads \
+              -v inu-dormitory-uploads:/app/files \
               --restart unless-stopped \
               ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:latest

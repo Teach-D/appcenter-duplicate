@@ -74,6 +74,6 @@ jobs:
               --network unidorm-network \
               -p 8056:8080 \
               -v unidorm-images:/app/images \
-              -v unidorm-uploads:/app/uploads \
+              -v unidorm-uploads:/app/files \
               --restart unless-stopped \
               ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:latest
