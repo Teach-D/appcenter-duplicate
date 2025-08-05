@@ -14,4 +14,6 @@ public interface AttachedFileRepository extends JpaRepository<AttachedFile, Long
     Optional<AttachedFile> findByFilePath(String filePath);
 
     Optional<AttachedFile> findByFilePathAndAnnouncementId(String filePath, Long announcementId);
+
+    Optional<AttachedFile> findByFilePathAndAnnouncement(String filePath, Announcement announcement);
 }

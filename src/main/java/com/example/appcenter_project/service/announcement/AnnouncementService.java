@@ -180,7 +180,9 @@ public class AnnouncementService {
 
     public void deleteAttachedFile(Long announcementId, String filePath) {
         Announcement announcement = announcementRepository.findById(announcementId).orElseThrow();
-        AttachedFile attachedFile = attachedFileRepository.findByFilePathAndAnnouncementId(filePath, announcementId).orElseThrow();
+        AttachedFile attachedFile = attachedFileRepository.findByFilePathAndAnnouncement(filePath, announcement).orElseThrow();
+
+
         File file = new File(filePath);
 
         if (file.exists()) {
