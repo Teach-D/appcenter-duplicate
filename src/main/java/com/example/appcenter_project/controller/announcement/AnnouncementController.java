@@ -78,7 +78,7 @@ public class AnnouncementController implements AnnouncementApiSpecification {
 
     @DeleteMapping("/{announcementId}/file/{filePath}")
     @Override
-    public void deleteFilePath(@PathVariable Long announcementId, @PathVariable String filePath) {
+    public void deleteFilePath(@PathVariable(name = "announcementId") Long announcementId, @PathVariable(name = "filePath") String filePath) {
         announcementService.deleteAttachedFile(announcementId, filePath);
     }
 
