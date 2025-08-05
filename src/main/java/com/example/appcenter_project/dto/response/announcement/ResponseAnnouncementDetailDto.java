@@ -45,7 +45,7 @@ public class ResponseAnnouncementDetailDto {
                 .viewCount(announcement.getViewCount())
                 .createdDate(announcement.getCreatedDate().toLocalDate())
                 .updatedDate(announcement.getModifiedDate().toLocalDate())
-                .isEmergency(announcement.isEmergency())
+                .isEmergency(announcement.getIsEmergency())
                 .build();
     }
 }

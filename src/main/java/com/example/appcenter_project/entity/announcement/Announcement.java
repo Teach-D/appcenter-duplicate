@@ -24,7 +24,7 @@ public class Announcement extends BaseTimeEntity {
     private String title;
     private String writer;
     private int viewCount = 0;
-    private boolean isEmergency;
+    private Boolean isEmergency = false;
 
     @Lob
     private String content;
@@ -48,6 +48,6 @@ public class Announcement extends BaseTimeEntity {
         this.title = requestAnnouncementDto.getTitle();
         this.writer = requestAnnouncementDto.getWriter();
         this.content = requestAnnouncementDto.getContent();
-        this.isEmergency = requestAnnouncementDto.isEmergency();
+        this.isEmergency = requestAnnouncementDto.getIsEmergency();
     }
 }
