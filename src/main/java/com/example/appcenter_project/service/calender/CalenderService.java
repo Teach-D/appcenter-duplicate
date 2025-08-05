@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,8 +42,8 @@ public class CalenderService {
     // 특정 년월의 캘린더 조회
     public List<ResponseCalenderDto> findCalendersByYearAndMonth(int year, int month) {
         YearMonth yearMonth = YearMonth.of(year, month);
-        LocalDateTime startOfMonth = yearMonth.atDay(1).atStartOfDay();
-        LocalDateTime startOfNextMonth = yearMonth.plusMonths(1).atDay(1).atStartOfDay();
+        LocalDate startOfMonth = yearMonth.atDay(1);
+        LocalDate startOfNextMonth = yearMonth.plusMonths(1).atDay(1);
         
         List<Calender> calenders = calenderRepository.findByYearAndMonth(startOfMonth, startOfNextMonth);
         List<ResponseCalenderDto> responseCalenderDtos = new ArrayList<>();

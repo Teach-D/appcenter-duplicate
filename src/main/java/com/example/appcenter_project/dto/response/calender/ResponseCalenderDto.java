@@ -17,9 +17,9 @@ public class ResponseCalenderDto {
 
     public static ResponseCalenderDto entityToDto(Calender calender) {
         return ResponseCalenderDto.builder()
-                .startDate(calender.getStartDate().toLocalDate())
-                .endDate(calender.getEndDate().toLocalDate())
-                .title(String.valueOf(calender.getTitle()))
+                .startDate(calender.getStartDate())
+                .endDate(calender.getEndDate())
+                .title(calender.getTitle())
                 .link(calender.getLink())
                 .build();
     }

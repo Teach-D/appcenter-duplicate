@@ -4,7 +4,6 @@ import com.example.appcenter_project.entity.calender.Calender;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter
 public class RequestCalenderDto {
@@ -16,8 +15,8 @@ public class RequestCalenderDto {
 
     public static Calender dtoToEntity(RequestCalenderDto requestCalenderDto) {
         return Calender.builder()
-                .startDate(LocalDateTime.parse(requestCalenderDto.getStartDate()))
-                .endDate(LocalDateTime.parse(requestCalenderDto.getEndDate()))
+                .startDate(LocalDate.parse(requestCalenderDto.getStartDate()))
+                .endDate(LocalDate.parse(requestCalenderDto.getEndDate()))
                 .title(requestCalenderDto.getTitle())
                 .link(requestCalenderDto.getLink())
                 .build();

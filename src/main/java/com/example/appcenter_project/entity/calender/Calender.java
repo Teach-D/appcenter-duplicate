@@ -11,7 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @NoArgsConstructor
@@ -23,13 +23,13 @@ public class Calender extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private String title;
     private String link;
 
     @Builder
-    public Calender(LocalDateTime startDate, LocalDateTime endDate, String title, String link) {
+    public Calender(LocalDate startDate, LocalDate endDate, String title, String link) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.title = title;
@@ -37,8 +37,8 @@ public class Calender extends BaseTimeEntity {
     }
 
     public void update(RequestCalenderDto requestCalenderDto) {
-        this.startDate = LocalDateTime.parse(requestCalenderDto.getStartDate());
-        this.endDate = LocalDateTime.parse(requestCalenderDto.getEndDate());
+        this.startDate = LocalDate.parse(requestCalenderDto.getStartDate());
+        this.endDate = LocalDate.parse(requestCalenderDto.getEndDate());
         this.title = requestCalenderDto.getTitle();
         this.link = requestCalenderDto.getLink();
     }
