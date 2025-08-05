@@ -3,6 +3,8 @@ package com.example.appcenter_project.service.calender;
 import com.example.appcenter_project.dto.request.calender.RequestCalenderDto;
 import com.example.appcenter_project.dto.response.calender.ResponseCalenderDto;
 import com.example.appcenter_project.entity.calender.Calender;
+import com.example.appcenter_project.exception.CustomException;
+import com.example.appcenter_project.exception.ErrorCode;
 import com.example.appcenter_project.repository.calender.CalenderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +15,8 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.appcenter_project.exception.ErrorCode.*;
 
 @Slf4j
 @Service
@@ -57,12 +61,12 @@ public class CalenderService {
     }
 
     public ResponseCalenderDto findCalender(Long calenderId) {
-        Calender calender = calenderRepository.findById(calenderId).orElseThrow();
+        Calender calender = calenderRepository.findById(calenderId).orElseThrow(() -> new CustomException(CALENDER_NOT_REGISTERED));
         return ResponseCalenderDto.entityToDto(calender);
     }
 
     public void updateCalender(Long calenderId, RequestCalenderDto requestCalenderDto) {
-        Calender calender = calenderRepository.findById(calenderId).orElseThrow();
+        Calender calender = calenderRepository.findById(calenderId).orElseThrow(() -> new CustomException(CALENDER_NOT_REGISTERED));
         calender.update(requestCalenderDto);
     }
 

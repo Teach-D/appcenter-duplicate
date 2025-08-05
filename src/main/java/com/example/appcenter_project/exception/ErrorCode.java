@@ -96,7 +96,11 @@ public enum ErrorCode {
     ANNOUNCEMENT_NOT_REGISTERED(NOT_FOUND, 12001, "[ANNOUNCEMENT] 해당 공지사항 정보를 찾을 수 없습니다"),
 
     // ATTACHEDFILE
-    ATTACHEDFILE_NOT_REGISTERED(NOT_FOUND, 13001, "[ATTACHEDFILE] 해당 파일을 찾을 수 없습니다");
+    ATTACHEDFILE_NOT_REGISTERED(NOT_FOUND, 13001, "[ATTACHEDFILE] 해당 파일을 찾을 수 없습니다"),
+
+    // CALENDER
+    CALENDER_NOT_REGISTERED(NOT_FOUND, 13001, "[CALENDER] 해당 캘린더 정보를 찾을 수 없습니다");
+
 
     private final HttpStatus httpStatus;
     private final Integer code;
