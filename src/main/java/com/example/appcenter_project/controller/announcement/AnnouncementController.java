@@ -76,10 +76,12 @@ public class AnnouncementController implements AnnouncementApiSpecification {
         return ResponseEntity.status(OK).body(announcementService.updateAnnouncement(requestAnnouncementDto, announcementId));
     }
 
-    @DeleteMapping("/{announcementId}/file/{filePath}")
-    @Override
-    public void deleteFilePath(@PathVariable(name = "announcementId") Long announcementId, @PathVariable(name = "filePath") String filePath) {
+    @DeleteMapping("/{announcementId}/file")
+    public ResponseEntity<Void> deleteAttachedFile(
+            @PathVariable Long announcementId, 
+            @RequestParam String filePath) {
         announcementService.deleteAttachedFile(announcementId, filePath);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{announcementId}")

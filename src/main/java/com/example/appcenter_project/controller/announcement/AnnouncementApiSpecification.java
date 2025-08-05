@@ -116,20 +116,6 @@ public interface AnnouncementApiSpecification {
             @PathVariable
             @Parameter(description = "공지사항 ID", required = true, example = "1") Long announcementId);
 
-    @Operation(
-            summary = "첨부파일 삭제",
-            description = "공지사항의 특정 첨부파일을 삭제합니다.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "삭제 성공"),
-                    @ApiResponse(responseCode = "404", description = "파일을 찾을 수 없음"),
-                    @ApiResponse(responseCode = "403", description = "권한 없음")
-            }
-    )
-    void deleteFilePath(
-            @PathVariable
-            @Parameter(description = "공지사항 ID", required = true, example = "1") Long announcementId,
-            @PathVariable
-            @Parameter(description = "파일 경로", required = true) String filePath);
 
     @Operation(
             summary = "공지사항 삭제",
