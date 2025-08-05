@@ -6,6 +6,7 @@ import com.example.appcenter_project.entity.tip.TipComment;
 import com.example.appcenter_project.entity.user.User;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class ResponseTipCommentDto {
     private String reply;
     private Long parentId;
     private Boolean isDeleted;
+    private LocalDateTime createdDate;
 
     @Builder.Default
     private List<ResponseTipCommentDto> childTipCommentList = new ArrayList<>();
@@ -29,6 +31,7 @@ public class ResponseTipCommentDto {
                 .tipCommentId(tipComment.getId())
                 .userId(user.getId())
                 .reply(tipComment.getReply())
+                .createdDate(tipComment.getCreatedDate())
                 .build();
     }
 
