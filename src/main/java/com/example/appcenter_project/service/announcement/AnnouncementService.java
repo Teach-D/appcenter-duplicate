@@ -211,7 +211,7 @@ public class AnnouncementService {
         List<ResponseAnnouncementDto> responseAnnouncementDtos = new ArrayList<>();
 
         for (Announcement announcement : announcements) {
-            ResponseAnnouncementDto responseAnnouncementDto = ResponseAnnouncementDto.entityToDTo(announcement);
+            ResponseAnnouncementDto responseAnnouncementDto = ResponseAnnouncementDto.entityToDto(announcement);
             responseAnnouncementDtos.add(responseAnnouncementDto);
         }
         return responseAnnouncementDtos;
@@ -233,6 +233,6 @@ public class AnnouncementService {
         Announcement announcement = announcementRepository.findById(announcementId).orElseThrow();
         announcement.update(requestAnnouncementDto);
 
-        return ResponseAnnouncementDto.entityToDTo(announcement);
+        return ResponseAnnouncementDto.entityToDto(announcement);
     }
 }
