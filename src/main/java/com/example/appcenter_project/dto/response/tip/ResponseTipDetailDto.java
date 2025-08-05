@@ -16,6 +16,7 @@ public class ResponseTipDetailDto {
     private String title;
     private String content;
     private Integer tipLikeCount;
+    private String name;
 
     @Builder.Default
     private List<Long> tipLikeUserList = new ArrayList<>();
@@ -32,6 +33,7 @@ public class ResponseTipDetailDto {
                 .title(tip.getTitle())
                 .content(tip.getContent())
                 .tipLikeCount(tip.getTipLike())
+                .name(tip.getUser().getName())
                 .tipLikeUserList(tipLikeUserList)
                 .tipCommentDtoList(responseTipCommentDtoList)
                 .build();
