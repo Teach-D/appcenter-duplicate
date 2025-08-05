@@ -24,6 +24,7 @@ public class Announcement extends BaseTimeEntity {
     private String title;
     private String writer;
     private int viewCount = 0;
+    private boolean isEmergency;
 
     @Lob
     private String content;
@@ -32,10 +33,11 @@ public class Announcement extends BaseTimeEntity {
     private List<AttachedFile> attachedFiles = new ArrayList<>();
 
     @Builder
-    public Announcement(String title, String writer, String content) {
+    public Announcement(String title, String writer, String content, boolean isEmergency) {
         this.title = title;
         this.writer = writer;
         this.content = content;
+        this.isEmergency = isEmergency;
     }
 
     public void plusViewCount() {
@@ -46,5 +48,6 @@ public class Announcement extends BaseTimeEntity {
         this.title = requestAnnouncementDto.getTitle();
         this.writer = requestAnnouncementDto.getWriter();
         this.content = requestAnnouncementDto.getContent();
+        this.isEmergency = requestAnnouncementDto.isEmergency();
     }
 }

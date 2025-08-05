@@ -10,12 +10,14 @@ public class RequestAnnouncementDto {
     private String title;
     private String writer;
     private String content;
+    private boolean isEmergency;
 
     public static Announcement dtoToEntity(RequestAnnouncementDto requestAnnouncementDto) {
         return Announcement.builder()
                 .title(requestAnnouncementDto.getTitle())
                 .writer(requestAnnouncementDto.getWriter())
                 .content(requestAnnouncementDto.getContent())
+                .isEmergency(requestAnnouncementDto.isEmergency())
                 .build();
     }
 
