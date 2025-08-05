@@ -17,6 +17,7 @@ public class ResponseTipDetailDto {
     private String content;
     private Integer tipLikeCount;
     private String name;
+    private boolean isCheckLikeCurrentUser = false;
 
     @Builder.Default
     private List<Long> tipLikeUserList = new ArrayList<>();
@@ -44,4 +45,7 @@ public class ResponseTipDetailDto {
         this.tipCommentDtoList = topLevelComments;
     }
 
+    public void updateIsCheckLikeCurrentUser(boolean check) {
+        this.isCheckLikeCurrentUser = check;
+    }
 }
