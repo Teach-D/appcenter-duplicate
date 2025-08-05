@@ -15,5 +15,7 @@ public interface RoommateChattingRoomRepository extends JpaRepository<RoommateCh
     boolean existsRoommateChattingRoomByHostAndGuest(User host, User guest);
 
     Optional<RoommateChattingRoom> findByHostAndGuest(User guest, User host);
+
+    Optional<RoommateChattingRoom> findByGuestAndHost(User guest, User host);
 }
 

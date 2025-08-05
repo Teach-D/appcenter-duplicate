@@ -53,10 +53,10 @@ public class RoommateChattingRoomService {
 
         // 양방향 생성 제한
         if (roommateChattingRoomRepository.existsRoommateChattingRoomByGuestAndHost(guest, host)) {
-            RoommateChattingRoom roommateChattingRoom = roommateChattingRoomRepository.findByHostAndGuest(guest, host).orElseThrow(() -> new CustomException(ROOMMATE_CHAT_ROOM_NOT_FOUND));
+            RoommateChattingRoom roommateChattingRoom = roommateChattingRoomRepository.findByGuestAndHost(guest, host).orElseThrow(() -> new CustomException(ROOMMATE_CHAT_ROOM_NOT_FOUND));
             return roommateChattingRoom.getId();
         } else if (roommateChattingRoomRepository.existsRoommateChattingRoomByGuestAndHost(host, guest)) {
-            RoommateChattingRoom roommateChattingRoom = roommateChattingRoomRepository.findByHostAndGuest(host, guest).orElseThrow(() -> new CustomException(ROOMMATE_CHAT_ROOM_NOT_FOUND));
+            RoommateChattingRoom roommateChattingRoom = roommateChattingRoomRepository.findByGuestAndHost(host, guest).orElseThrow(() -> new CustomException(ROOMMATE_CHAT_ROOM_NOT_FOUND));
             return roommateChattingRoom.getId();
         }
 
