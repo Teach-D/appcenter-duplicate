@@ -182,6 +182,7 @@ public class AnnouncementService {
         Announcement announcement = announcementRepository.findById(announcementId).orElseThrow();
         AttachedFile attachedFile = attachedFileRepository.findByFilePathAndAnnouncement(filePath, announcement).orElseThrow();
 
+        log.info("111111111111111111111111111111");
 
         File file = new File(filePath);
 
@@ -194,7 +195,13 @@ public class AnnouncementService {
             log.warn("Attached file not found: {}", filePath);
         }
 
+        log.info("22222222222222222222222222222222");
+
+
         attachedFileRepository.delete(attachedFile);
+
+        log.info("33333333333333333333333333");
+
 
         announcement.getAttachedFiles().remove(attachedFile);
     }
