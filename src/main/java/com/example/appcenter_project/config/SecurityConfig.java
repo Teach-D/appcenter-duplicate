@@ -52,6 +52,8 @@ public class SecurityConfig {
                         .requestMatchers(PUT, "/announcements/**").hasRole("ADMIN")
                         .requestMatchers(DELETE, "/announcements/**").hasRole("ADMIN")
                         .requestMatchers(GET, "/announcements/**").permitAll()
+                        .requestMatchers("/file/**").permitAll()
+
                         .requestMatchers(GET, "/reports/**").hasRole("ADMIN")
                         .requestMatchers(DELETE, "/reports/**").hasRole("ADMIN")
                         .requestMatchers("/**").hasRole("USER")
