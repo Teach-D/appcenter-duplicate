@@ -19,6 +19,7 @@ import com.example.appcenter_project.repository.like.TipLikeRepository;
 import com.example.appcenter_project.repository.tip.TipCommentRepository;
 import com.example.appcenter_project.repository.tip.TipRepository;
 import com.example.appcenter_project.repository.user.UserRepository;
+import com.example.appcenter_project.security.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -192,8 +193,29 @@ public class TipService {
         }
     }
 
-    public ResponseTipDetailDto findTip(Long tipId) {
+    public ResponseTipDetailDto findTip(CustomUserDetails user, Long tipId) {
         ResponseTipDetailDto flatDto = tipMapper.findTip(tipId);
+
+        log.info(String.valueOf(user));
+
+        // 현재 유저가 해당 팁 게시글의 좋아요를 누른 유저인지 확인
+        // 로그인 한 경우일 때
+/*
+        if (user.getId() != null) {
+            User loginUser = userRepository.findById(user.getId()).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+            // 로그인한 유저가 해당 게시글의 좋아요를 누른 경우 true 반환
+            if(tipLikeRepository.existsByUserIdAndTipId(loginUser.getId(), tipId) == true) {
+                flatDto.updateIsCheckLikeCurrentUser(true);
+            }
+            // 로그인한 유저가 해당 게시글의 좋아요를 누르지 않은 경우 false 반환
+            else {
+                flatDto.updateIsCheckLikeCurrentUser(false);
+            }
+        }
+*/
+
+
         if (flatDto == null) {
             throw new CustomException(TIP_NOT_FOUND);
         }
@@ -227,6 +249,7 @@ public class TipService {
         flatDto.updateTipCommentDtoList(topLevelComments);
         return flatDto;
     }
+
 
 
 
