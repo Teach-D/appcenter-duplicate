@@ -31,6 +31,14 @@ public class CalenderController {
         return ResponseEntity.status(OK).body(calenderService.findAllCalenders());
     }
 
+    // 특정 년월의 캘린더 조회
+    @GetMapping("/search")
+    public ResponseEntity<List<ResponseCalenderDto>> getCalendersByYearAndMonth(
+            @RequestParam int year, 
+            @RequestParam int month) {
+        return ResponseEntity.status(OK).body(calenderService.findCalendersByYearAndMonth(year, month));
+    }
+
     @GetMapping("/{calenderId}")
     public ResponseEntity<ResponseCalenderDto> getCalender(@PathVariable Long calenderId) {
         return ResponseEntity.status(OK).body(calenderService.findCalender(calenderId));
