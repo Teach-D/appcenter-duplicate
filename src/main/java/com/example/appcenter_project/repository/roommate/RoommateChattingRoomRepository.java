@@ -10,5 +10,7 @@ import java.util.List;
 public interface RoommateChattingRoomRepository extends JpaRepository<RoommateChattingRoom, Long> {
     boolean existsByRoommateBoardAndGuest(RoommateBoard board, User guest);
     List<RoommateChattingRoom> findAllByHostOrGuest(User host, User guest);
+    boolean existsRoommateChattingRoomByGuestAndHost(User guest, User host);
+    boolean existsRoommateChattingRoomByHostAndGuest(User host, User guest);
 }
 

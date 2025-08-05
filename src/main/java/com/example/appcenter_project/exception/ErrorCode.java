@@ -86,6 +86,8 @@ public enum ErrorCode {
     DUPLICATE_CHAT_ROOM(CONFLICT, 10001, "[RoommateChat] 이미 존재하는 채팅방입니다."),
     ROOMMATE_CHAT_ROOM_NOT_FOUND(NOT_FOUND, 7013, "[RoommateChat] 채팅방을 찾을 수 없습니다."),
     ROOMMATE_CHAT_ROOM_FORBIDDEN(FORBIDDEN, 10004, "[RoommateChat] 이 채팅방에 속하지 않은 사용자입니다."),
+    ROOMMATE_CHAT_ROOM_DENIED(PRECONDITION_FAILED, 10004, "[RoommateChat] 양방향 채팅방 생성은 할 수 없습니다."),
+
 
     // REPORT
     REPORT_NOT_REGISTERED(NOT_FOUND, 11001, "[Report] 해당 신고 정보를 찾을 수 없습니다");
