@@ -54,6 +54,13 @@ public class SecurityConfig {
                         .requestMatchers(GET, "/announcements/**").permitAll()
                         .requestMatchers("/files/**").permitAll()
 
+                        // 캘린더 관련 엔드포인트
+                        .requestMatchers(POST, "/calenders/**").hasRole("ADMIN")
+                        .requestMatchers(PUT, "/calenders/**").hasRole("ADMIN")
+                        .requestMatchers(DELETE, "/calenders/**").hasRole("ADMIN")
+                        .requestMatchers(GET, "/calenders/**").permitAll()
+
+
                         .requestMatchers(GET, "/reports/**").hasRole("ADMIN")
                         .requestMatchers(DELETE, "/reports/**").hasRole("ADMIN")
                         .requestMatchers("/**").hasRole("USER")
