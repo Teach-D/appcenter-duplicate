@@ -41,6 +41,7 @@ public class RoommateService {
                 .dormPeriod(requestDto.getDormPeriod())
                 .dormType(requestDto.getDormType())
                 .college(requestDto.getCollege())
+                .religion(requestDto.getReligion())
                 .mbti(requestDto.getMbti())
                 .smoking(requestDto.getSmoking())
                 .snoring(requestDto.getSnoring())
@@ -73,6 +74,7 @@ public class RoommateService {
                 .dormPeriod(savedCheckList.getDormPeriod())
                 .dormType(savedCheckList.getDormType())
                 .college(savedCheckList.getCollege())
+                .religion(savedCheckList.getReligion())
                 .mbti(savedCheckList.getMbti())
                 .smoking(savedCheckList.getSmoking())
                 .snoring(savedCheckList.getSnoring())
@@ -83,6 +85,9 @@ public class RoommateService {
                 .bedTime(savedCheckList.getBedTime())
                 .arrangement(savedCheckList.getArrangement())
                 .comment(savedCheckList.getComment())
+                .userId(user.getId())
+                .userName(user.getName())
+                .createdDate(roommateBoard.getCreatedDate())
                 .build();
     }
 
@@ -97,12 +102,14 @@ public class RoommateService {
         return boards.stream() //게시글 목록을 하나 꺼내서 준비
                 .map(board -> { //꺼낸 게시글 하나를 꾸미기 시작
                     RoommateCheckList cl = board.getRoommateCheckList(); //룸메이트 보드에있는 체크리스트를 꺼냄
+                    User writer = board.getUser();
                     return ResponseRoommatePostDto.builder() //화면에 보여줄 정보를 담아줌
                             .boardId(board.getId())
                             .title(cl.getTitle())
                             .dormPeriod(cl.getDormPeriod())
                             .dormType(cl.getDormType())
                             .college(cl.getCollege())
+                            .religion(cl.getReligion())
                             .mbti(cl.getMbti())
                             .smoking(cl.getSmoking())
                             .snoring(cl.getSnoring())
@@ -114,6 +121,9 @@ public class RoommateService {
                             .arrangement(cl.getArrangement())
                             .comment(cl.getComment())
                             .roommateBoardLike(board.getRoommateBoardLike())
+                            .userId(writer.getId())
+                            .userName(writer.getName())
+                            .createdDate(board.getCreatedDate())
                             .build(); //dto하나가 만들어짐
                 })
                 .toList(); //만든 dto들을 모아서 리스트로 뭉쳐줌
@@ -155,6 +165,7 @@ public class RoommateService {
 
                     if (myChecklist.getDormType() == other.getDormType()) score++;
                     if (myChecklist.getCollege() == other.getCollege()) score++;
+                    if (myChecklist.getReligion() == other.getReligion()) score++;
                     if (myChecklist.getMbti().equals(other.getMbti())) score++;
                     if (myChecklist.getSmoking() == other.getSmoking()) score++;
                     if (myChecklist.getSnoring() == other.getSnoring()) score++;
@@ -165,7 +176,7 @@ public class RoommateService {
                     if (myChecklist.getBedTime() == other.getBedTime()) score++;
                     if (myChecklist.getArrangement() == other.getArrangement()) score++;
 
-                    int similarityPercentage = (int) ((score / 11.0) * 100);
+                    int similarityPercentage = (int) ((score / 12.0) * 100);
 
                     return Map.entry(board, similarityPercentage);
                 })
@@ -175,12 +186,16 @@ public class RoommateService {
                     return e2.getKey().getCreatedDate().compareTo(e1.getKey().getCreatedDate()); // 유사도 같으면 최신순
                 })
                 .map(entry -> {
+                    RoommateBoard board = entry.getKey();
                     RoommateCheckList cl = entry.getKey().getRoommateCheckList();
+                    User writer = board.getUser();
+
                     return ResponseRoommateSimilarityDto.builder()
                             .boardId(entry.getKey().getId())
                             .title(cl.getTitle())
                             .dormType(cl.getDormType())
                             .college(cl.getCollege())
+                            .religion(cl.getReligion())
                             .mbti(cl.getMbti())
                             .smoking(cl.getSmoking())
                             .snoring(cl.getSnoring())
@@ -193,6 +208,9 @@ public class RoommateService {
                             .comment(cl.getComment())
                             .similarityPercentage(entry.getValue())
                             .roommateBoardLike(entry.getKey().getRoommateBoardLike())
+                            .userId(writer.getId())
+                            .userName(writer.getName())
+                            .createdDate(board.getCreatedDate())
                             .build();
                 })
                 .toList();
