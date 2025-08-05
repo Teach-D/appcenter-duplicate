@@ -1,20 +1,15 @@
 package com.example.appcenter_project.controller.announcement;
 
-
 import com.example.appcenter_project.dto.AttachedFileDto;
-import com.example.appcenter_project.dto.ImageLinkDto;
 import com.example.appcenter_project.dto.request.announement.RequestAnnouncementDto;
-import com.example.appcenter_project.dto.request.tip.RequestTipDto;
 import com.example.appcenter_project.dto.response.announcement.ResponseAnnouncementDetailDto;
 import com.example.appcenter_project.dto.response.announcement.ResponseAnnouncementDto;
-import com.example.appcenter_project.dto.response.tip.ResponseTipDto;
 import com.example.appcenter_project.security.CustomUserDetails;
 import com.example.appcenter_project.service.announcement.AnnouncementService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Delete;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +26,12 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/announcements")
-public class AnnouncementController {
+public class AnnouncementController implements AnnouncementApiSpecification {
 
     private final AnnouncementService announcementService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Override
     public ResponseEntity<Void> saveAnnouncement(
             @AuthenticationPrincipal CustomUserDetails user,
             @Valid @RequestPart("requestAnnouncementDto") RequestAnnouncementDto requestAnnouncementDto,
@@ -44,20 +40,20 @@ public class AnnouncementController {
         return ResponseEntity.status(CREATED).build();
     }
 
-    // 모든 Announcement 조회
     @GetMapping
+    @Override
     public ResponseEntity<List<ResponseAnnouncementDto>> findAllAnnouncements() {
         return ResponseEntity.status(OK).body(announcementService.findAllAnnouncements());
     }
 
-    // 특정 Announcement 조회
     @GetMapping("/{announcementId}")
+    @Override
     public ResponseEntity<ResponseAnnouncementDetailDto> findAnnouncement(@PathVariable Long announcementId) {
         return ResponseEntity.status(OK).body(announcementService.findAnnouncement(announcementId));
     }
 
-    // 특정 Announcement AttachedFile 조회
     @GetMapping("/{announcementId}/image")
+    @Override
     public ResponseEntity<List<AttachedFileDto>> findAnnouncementFile(
             @PathVariable Long announcementId,
             HttpServletRequest request) {
@@ -67,24 +63,27 @@ public class AnnouncementController {
                     .header(HttpHeaders.CONTENT_TYPE, "application/json")
                     .body(fileDtos);
         } catch (Exception e) {
-            log.error("Error retrieving tip images: ", e);
+            log.error("Error retrieving announcement files: ", e);
             throw e;
         }
     }
 
     @PutMapping("/{announcementId}")
-    public ResponseEntity<ResponseAnnouncementDto> updateAnnouncement(@RequestBody RequestAnnouncementDto requestAnnouncementDto, @PathVariable Long announcementId) {
+    @Override
+    public ResponseEntity<ResponseAnnouncementDto> updateAnnouncement(
+            @Valid @RequestBody RequestAnnouncementDto requestAnnouncementDto,
+            @PathVariable Long announcementId) {
         return ResponseEntity.status(OK).body(announcementService.updateAnnouncement(requestAnnouncementDto, announcementId));
     }
 
-    // AttachedFile 하나 삭제
     @DeleteMapping("/{announcementId}/file/{filePath}")
+    @Override
     public void deleteFilePath(@PathVariable Long announcementId, @PathVariable String filePath) {
         announcementService.deleteAttachedFile(announcementId, filePath);
     }
 
-    // 특정 Announcement 삭제
     @DeleteMapping("/{announcementId}")
+    @Override
     public void deleteAnnouncement(@PathVariable Long announcementId) {
         announcementService.deleteAnnouncement(announcementId);
     }

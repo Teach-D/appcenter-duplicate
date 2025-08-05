@@ -12,4 +12,6 @@ public interface AttachedFileRepository extends JpaRepository<AttachedFile,Integ
     void deleteByFilePath(String filePath);
 
     Optional<AttachedFile> findByFilePath(String filePath);
+
+    Optional<AttachedFile> findByFilePathAndAnnouncementId(String filePath, Long announcementId);
 }
