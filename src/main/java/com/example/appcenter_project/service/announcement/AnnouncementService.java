@@ -53,7 +53,7 @@ public class AnnouncementService {
         if (files != null && !files.isEmpty()) {
             // 개발 환경에 맞는 경로 설정
             String basePath = System.getProperty("user.dir");
-            String filePath = basePath + "/file/announcement/";
+            String filePath = basePath + "/files/announcement/";
 
             // 디렉토리 생성 (존재하지 않으면)
             File directory = new File(filePath);
@@ -126,7 +126,7 @@ public class AnnouncementService {
         for (AttachedFile attachedFile : attachedFiles) {
             File file = new File(attachedFile.getFilePath());
             if (file.exists()) {
-                String fileUrl = baseUrl + "/api/file/announcement/" + attachedFile.getId();
+                String fileUrl = baseUrl + "/api/files/announcement/" + attachedFile.getId();
 
                 // 정적 리소스 URL 생성 (User와 동일한 방식)
                 String staticImageUrl = getStaticAttachedFileUrl(attachedFile.getFilePath(), baseUrl);
@@ -171,7 +171,7 @@ public class AnnouncementService {
     private String getStaticAttachedFileUrl(String filePath, String baseUrl) {
         try {
             String fileName = Paths.get(filePath).getFileName().toString();
-            return baseUrl + "/file/announcement/" + fileName;
+            return baseUrl + "/files/announcement/" + fileName;
         } catch (Exception e) {
             log.warn("Could not generate static URL for Attached file path: {}", filePath);
             return null;

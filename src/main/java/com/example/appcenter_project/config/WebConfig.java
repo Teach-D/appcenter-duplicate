@@ -13,5 +13,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/images/**")
                 .addResourceLocations("file:/app/images/")  // 로컬 파일 시스템 경로
                 .setCachePeriod(3600);
+         registry.addResourceHandler("/files/**")
+                 .addResourceLocations("file:/app/files/")  // 로컬 파일 시스템 경로
+                 .setCachePeriod(3600);
     }
 }
