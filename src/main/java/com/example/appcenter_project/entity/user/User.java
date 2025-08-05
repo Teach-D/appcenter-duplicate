@@ -7,6 +7,7 @@ import com.example.appcenter_project.entity.Image;
 import com.example.appcenter_project.entity.groupOrder.GroupOrder;
 import com.example.appcenter_project.entity.groupOrder.UserGroupOrderChatRoom;
 import com.example.appcenter_project.entity.like.GroupOrderLike;
+import com.example.appcenter_project.entity.like.RoommateBoardLike;
 import com.example.appcenter_project.entity.like.TipLike;
 import com.example.appcenter_project.entity.roommate.RoommateBoard;
 import com.example.appcenter_project.entity.roommate.RoommateCheckList;
@@ -87,6 +88,17 @@ public class User extends BaseTimeEntity {
 
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private MyRoommate myRoommate;
+
+    @OneToMany(mappedBy = "user")
+    private List<RoommateBoardLike> roommateBoardLikeList = new ArrayList<>();
+
+    public void addRoommateBoardLike(RoommateBoardLike roommateBoardLike) {
+        this.roommateBoardLikeList.add(roommateBoardLike);
+    }
+
+    public void removeRoommateBoardLike(RoommateBoardLike roommateBoardLike) {
+        this.roommateBoardLikeList.remove(roommateBoardLike);
+    }
 
 
     @Builder
