@@ -11,6 +11,7 @@ import com.example.appcenter_project.entity.announcement.Announcement;
 import com.example.appcenter_project.entity.announcement.AttachedFile;
 import com.example.appcenter_project.enums.image.ImageType;
 import com.example.appcenter_project.exception.CustomException;
+import com.example.appcenter_project.exception.ErrorCode;
 import com.example.appcenter_project.repository.announcement.AnnouncementRepository;
 import com.example.appcenter_project.repository.announcement.AttachedFileRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.example.appcenter_project.exception.ErrorCode.*;
 import static com.example.appcenter_project.exception.ErrorCode.IMAGE_NOT_FOUND;
 
 @Slf4j
@@ -110,7 +112,7 @@ public class AnnouncementService {
     }
 
     public List<AttachedFileDto> findAttachedFileByAnnouncementId(Long announcementId, HttpServletRequest request) {
-        Announcement announcement = announcementRepository.findById(announcementId).orElseThrow();
+        Announcement announcement = announcementRepository.findById(announcementId).orElseThrow(() -> new CustomException(ANNOUNCEMENT_NOT_REGISTERED));
 
         List<AttachedFile> attachedFiles = attachedFileRepository.findByAnnouncement(announcement);
 
@@ -179,10 +181,8 @@ public class AnnouncementService {
     }
 
     public void deleteAttachedFile(Long announcementId, String filePath) {
-        Announcement announcement = announcementRepository.findById(announcementId).orElseThrow();
-        AttachedFile attachedFile = attachedFileRepository.findByFilePathAndAnnouncement(filePath, announcement).orElseThrow();
-
-        log.info("111111111111111111111111111111");
+        Announcement announcement = announcementRepository.findById(announcementId).orElseThrow(() -> new CustomException(ANNOUNCEMENT_NOT_REGISTERED));
+        AttachedFile attachedFile = attachedFileRepository.findByFilePathAndAnnouncement(filePath, announcement).orElseThrow(() -> new CustomException(ATTACHEDFILE_NOT_REGISTERED));
 
         File file = new File(filePath);
 
@@ -195,14 +195,7 @@ public class AnnouncementService {
             log.warn("Attached file not found: {}", filePath);
         }
 
-        log.info("22222222222222222222222222222222");
-
-
         attachedFileRepository.delete(attachedFile);
-
-        log.info("33333333333333333333333333");
-
-
         announcement.getAttachedFiles().remove(attachedFile);
     }
 
@@ -218,7 +211,7 @@ public class AnnouncementService {
     }
 
     public ResponseAnnouncementDetailDto findAnnouncement(Long announcementId) {
-        Announcement announcement = announcementRepository.findById(announcementId).orElseThrow();
+        Announcement announcement = announcementRepository.findById(announcementId).orElseThrow(() -> new CustomException(ANNOUNCEMENT_NOT_REGISTERED));
         announcement.plusViewCount();
 
         return ResponseAnnouncementDetailDto.entityToDto(announcement);
@@ -230,7 +223,7 @@ public class AnnouncementService {
 
     public ResponseAnnouncementDto updateAnnouncement(RequestAnnouncementDto requestAnnouncementDto, Long announcementId) {
 
-        Announcement announcement = announcementRepository.findById(announcementId).orElseThrow();
+        Announcement announcement = announcementRepository.findById(announcementId).orElseThrow(() -> new CustomException(ANNOUNCEMENT_NOT_REGISTERED));
         announcement.update(requestAnnouncementDto);
 
         return ResponseAnnouncementDto.entityToDto(announcement);

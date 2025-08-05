@@ -90,7 +90,13 @@ public enum ErrorCode {
 
 
     // REPORT
-    REPORT_NOT_REGISTERED(NOT_FOUND, 11001, "[Report] 해당 신고 정보를 찾을 수 없습니다");
+    REPORT_NOT_REGISTERED(NOT_FOUND, 11001, "[Report] 해당 신고 정보를 찾을 수 없습니다"),
+
+    // ANNOUNCEMENT
+    ANNOUNCEMENT_NOT_REGISTERED(NOT_FOUND, 12001, "[ANNOUNCEMENT] 해당 공지사항 정보를 찾을 수 없습니다"),
+
+    // ATTACHEDFILE
+    ATTACHEDFILE_NOT_REGISTERED(NOT_FOUND, 13001, "[ATTACHEDFILE] 해당 파일을 찾을 수 없습니다");
 
     private final HttpStatus httpStatus;
     private final Integer code;
