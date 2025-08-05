@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -201,6 +202,8 @@ public class AnnouncementService {
 
     public List<ResponseAnnouncementDto> findAllAnnouncements() {
         List<Announcement> announcements = announcementRepository.findAll();
+        Collections.reverse(announcements);
+
         List<ResponseAnnouncementDto> responseAnnouncementDtos = new ArrayList<>();
 
         for (Announcement announcement : announcements) {

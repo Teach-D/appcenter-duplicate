@@ -265,7 +265,9 @@ public class TipService {
     }*/
 
     public List<ResponseTipDto> findAllTips() {
-        return tipMapper.findTips();
+        List<ResponseTipDto> tips = tipMapper.findTips();
+        Collections.reverse(tips);
+        return tips;
 /*        List<ResponseTipDto> responseTipDtoList = new ArrayList<>();
         List<Tip> tips = tipRepository.findAll();
         for (Tip tip : tips) {
