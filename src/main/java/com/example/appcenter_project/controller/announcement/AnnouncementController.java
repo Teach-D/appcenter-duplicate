@@ -5,6 +5,7 @@ import com.example.appcenter_project.dto.AttachedFileDto;
 import com.example.appcenter_project.dto.ImageLinkDto;
 import com.example.appcenter_project.dto.request.announement.RequestAnnouncementDto;
 import com.example.appcenter_project.dto.request.tip.RequestTipDto;
+import com.example.appcenter_project.dto.response.announcement.ResponseAnnouncementDetailDto;
 import com.example.appcenter_project.dto.response.announcement.ResponseAnnouncementDto;
 import com.example.appcenter_project.dto.response.tip.ResponseTipDto;
 import com.example.appcenter_project.security.CustomUserDetails;
@@ -51,7 +52,7 @@ public class AnnouncementController {
 
     // 특정 Announcement 조회
     @GetMapping("/{announcementId}")
-    public ResponseEntity<ResponseAnnouncementDto> findAnnouncement(@PathVariable Long announcementId) {
+    public ResponseEntity<ResponseAnnouncementDetailDto> findAnnouncement(@PathVariable Long announcementId) {
         return ResponseEntity.status(OK).body(announcementService.findAnnouncement(announcementId));
     }
 

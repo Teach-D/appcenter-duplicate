@@ -4,6 +4,7 @@ import com.example.appcenter_project.entity.announcement.Announcement;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Builder
@@ -12,15 +13,15 @@ public class ResponseAnnouncementDto {
 
     private Long id;
     private String title;
-    private LocalDateTime createdDate;
-    private LocalDateTime updatedDate;
+    private LocalDate createdDate;
+    private LocalDate updatedDate;
 
     public static ResponseAnnouncementDto entityToDTo(Announcement announcement) {
         return ResponseAnnouncementDto.builder()
                 .id(announcement.getId())
                 .title(announcement.getTitle())
-                .createdDate(announcement.getCreatedDate())
-                .updatedDate(announcement.getModifiedDate())
+                .createdDate(announcement.getCreatedDate().toLocalDate())
+                .updatedDate(announcement.getModifiedDate().toLocalDate())
                 .build();
     }
 }

@@ -3,6 +3,7 @@ package com.example.appcenter_project.service.announcement;
 import com.example.appcenter_project.dto.AttachedFileDto;
 import com.example.appcenter_project.dto.ImageLinkDto;
 import com.example.appcenter_project.dto.request.announement.RequestAnnouncementDto;
+import com.example.appcenter_project.dto.response.announcement.ResponseAnnouncementDetailDto;
 import com.example.appcenter_project.dto.response.announcement.ResponseAnnouncementDto;
 import com.example.appcenter_project.dto.response.tip.ResponseTipDto;
 import com.example.appcenter_project.entity.Image;
@@ -208,11 +209,11 @@ public class AnnouncementService {
         return responseAnnouncementDtos;
     }
 
-    public ResponseAnnouncementDto findAnnouncement(Long announcementId) {
+    public ResponseAnnouncementDetailDto findAnnouncement(Long announcementId) {
         Announcement announcement = announcementRepository.findById(announcementId).orElseThrow();
         announcement.plusViewCount();
 
-        return ResponseAnnouncementDto.entityToDTo(announcement);
+        return ResponseAnnouncementDetailDto.entityToDto(announcement);
     }
 
     public void deleteAnnouncement(Long announcementId) {
