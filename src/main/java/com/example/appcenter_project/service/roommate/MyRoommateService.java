@@ -88,4 +88,8 @@ public class MyRoommateService {
         ImageLinkDto imageLinkDto = imageService.findUserTimeTableImageUrlByUserId(myRoommateId, request);
         return imageLinkDto;
     }
+
+    public ImageLinkDto getMyRoommateImage(Long userId, HttpServletRequest request) {
+        return imageService.findUserImageUrlByUserId(userId, request);
+    }
 }
