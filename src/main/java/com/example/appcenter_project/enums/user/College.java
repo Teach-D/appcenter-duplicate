@@ -23,7 +23,7 @@ public enum College {
     INTERDISCIPLINARY_STUDIES("융합자유전공대"),
     NORTHEAST_ASIAN_INTERNATIONAL_COMMERCE_AND_LOGISTICS("동북아국제통상물류학부"),
     LAW("법학부"),
-    CONTRACT_DEPARTMENT("계약학");
+    CONTRACT_DEPARTMENT("계약학과");
 
     private final String description;
 
