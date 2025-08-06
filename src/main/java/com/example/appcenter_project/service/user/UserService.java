@@ -26,6 +26,7 @@ import com.example.appcenter_project.mapper.TipMapper;
 import com.example.appcenter_project.repository.image.ImageRepository;
 import com.example.appcenter_project.repository.like.GroupOrderLikeRepository;
 import com.example.appcenter_project.repository.like.RoommateBoardLikeRepository;
+import com.example.appcenter_project.repository.like.TipLikeRepository;
 import com.example.appcenter_project.repository.user.SchoolLoginRepository;
 import com.example.appcenter_project.repository.user.UserRepository;
 import com.example.appcenter_project.security.jwt.JwtTokenProvider;
@@ -59,6 +60,7 @@ public class UserService {
     private final GroupOrderMapper groupOrderMapper;
     private final TipMapper tipMapper;
     private final RoommateBoardLikeRepository roommateBoardLikeRepository;
+    private final TipLikeRepository tipLikeRepository;
 
     public ResponseLoginDto saveUser(SignupUser signupUser) {
         boolean existsByStudentNumber = userRepository.existsByStudentNumber(signupUser.getStudentNumber());
@@ -144,10 +146,16 @@ public class UserService {
             responseLikeDtoList.add(responseRoommatePostDto);
         }
 
-        List<ResponseTipDto> likeTips = tipMapper.findLikeTips(userId);
+        List<ResponseTipDto> responseTipDtos = new ArrayList<>();
+        List<TipLike> tipLikes = tipLikeRepository.findByUserId(userId);
+        for (TipLike tipLike : tipLikes) {
+            Tip tip = tipLike.getTip();
+            ResponseTipDto responseTipDto = ResponseTipDto.entityToDto(tip);
+            responseTipDtos.add(responseTipDto);
+        }
 
         responseBoardDtoList.addAll(responseLikeDtoList);
-        responseBoardDtoList.addAll(likeTips);
+        responseBoardDtoList.addAll(responseTipDtos);
 
         // 로그 추가로 디버깅
         log.info("정렬 전 데이터:");
