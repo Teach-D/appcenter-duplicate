@@ -151,7 +151,7 @@ public class UserService {
         responseBoardDtoList.addAll(likeTips);
 
         // 최신순 정렬 (createTime이 가장 최근인 것부터)
-        responseBoardDtoList.sort(Comparator.comparing(ResponseBoardDto::getCreateDate).reversed());
+         responseBoardDtoList.sort(Comparator.comparing(ResponseBoardDto::getCreateDate).reversed());
 
         return responseBoardDtoList;
     }

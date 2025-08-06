@@ -91,6 +91,7 @@ public class ResponseRoommatePostDto extends ResponseBoardDto {
                 .userId(user.getId())
                 .userName(user.getName())
                 .isMatched(isMatched)
+                .createDate(board.getCreatedDate())
                 .build();
     }
 }
