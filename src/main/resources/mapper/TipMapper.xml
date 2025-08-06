@@ -4,7 +4,7 @@
 <mapper namespace="com.example.appcenter_project.mapper.TipMapper">
 
     <resultMap id="tipResultMap" type="com.example.appcenter_project.dto.response.tip.ResponseTipDto">
-        <id property="id" column="id"/>
+        <id property="board_id" column="id"/>
         <result property="title" column="title"/>
         <result property="type" column="type"/>
         <result property="createDate" column="created_date"/>
