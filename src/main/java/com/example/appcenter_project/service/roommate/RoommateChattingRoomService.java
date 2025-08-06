@@ -51,6 +51,15 @@ public class RoommateChattingRoomService {
         User guest = userRepository.findById(guestId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
+        // 양방향 생성 제한
+        if (roommateChattingRoomRepository.existsRoommateChattingRoomByGuestAndHost(guest, host)) {
+            RoommateChattingRoom roommateChattingRoom = roommateChattingRoomRepository.findByGuestAndHost(guest, host).orElseThrow(() -> new CustomException(ROOMMATE_CHAT_ROOM_NOT_FOUND));
+            return roommateChattingRoom.getId();
+        } else if (roommateChattingRoomRepository.existsRoommateChattingRoomByGuestAndHost(host, guest)) {
+            RoommateChattingRoom roommateChattingRoom = roommateChattingRoomRepository.findByGuestAndHost(host, guest).orElseThrow(() -> new CustomException(ROOMMATE_CHAT_ROOM_NOT_FOUND));
+            return roommateChattingRoom.getId();
+        }
+
         // 자기 자신과 채팅 방지
         if (host.getId().equals(guest.getId())) {
             throw new CustomException(ROOMMATE_CHAT_CANNOT_CHAT_WITH_SELF);

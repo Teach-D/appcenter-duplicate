@@ -4,6 +4,7 @@ import com.example.appcenter_project.dto.request.user.RequestUserDto;
 import com.example.appcenter_project.dto.request.user.SignupUser;
 import com.example.appcenter_project.dto.response.groupOrder.ResponseGroupOrderDto;
 import com.example.appcenter_project.dto.response.like.ResponseLikeDto;
+import com.example.appcenter_project.dto.response.roommate.ResponseRoommatePostDto;
 import com.example.appcenter_project.dto.response.tip.ResponseTipDetailDto;
 import com.example.appcenter_project.dto.response.tip.ResponseTipDto;
 import com.example.appcenter_project.dto.response.user.ResponseBoardDto;
@@ -12,7 +13,9 @@ import com.example.appcenter_project.dto.response.user.ResponseUserDto;
 import com.example.appcenter_project.entity.Image;
 import com.example.appcenter_project.entity.groupOrder.GroupOrder;
 import com.example.appcenter_project.entity.like.GroupOrderLike;
+import com.example.appcenter_project.entity.like.RoommateBoardLike;
 import com.example.appcenter_project.entity.like.TipLike;
+import com.example.appcenter_project.entity.roommate.RoommateBoard;
 import com.example.appcenter_project.entity.tip.Tip;
 import com.example.appcenter_project.entity.user.User;
 import com.example.appcenter_project.enums.image.ImageType;
@@ -22,6 +25,8 @@ import com.example.appcenter_project.mapper.GroupOrderMapper;
 import com.example.appcenter_project.mapper.TipMapper;
 import com.example.appcenter_project.repository.image.ImageRepository;
 import com.example.appcenter_project.repository.like.GroupOrderLikeRepository;
+import com.example.appcenter_project.repository.like.RoommateBoardLikeRepository;
+import com.example.appcenter_project.repository.like.TipLikeRepository;
 import com.example.appcenter_project.repository.user.SchoolLoginRepository;
 import com.example.appcenter_project.repository.user.UserRepository;
 import com.example.appcenter_project.security.jwt.JwtTokenProvider;
@@ -54,6 +59,8 @@ public class UserService {
     private final SchoolLoginRepository schoolLoginRepository;
     private final GroupOrderMapper groupOrderMapper;
     private final TipMapper tipMapper;
+    private final RoommateBoardLikeRepository roommateBoardLikeRepository;
+    private final TipLikeRepository tipLikeRepository;
 
     public ResponseLoginDto saveUser(SignupUser signupUser) {
         boolean existsByStudentNumber = userRepository.existsByStudentNumber(signupUser.getStudentNumber());
@@ -128,14 +135,42 @@ public class UserService {
     public List<ResponseBoardDto> findLikeByUserId(Long userId) {
         List<ResponseBoardDto> responseBoardDtoList = new ArrayList<>();
 
-        List<ResponseGroupOrderDto> likeGroupOrders = groupOrderMapper.findLikeGroupOrders(userId);
-        List<ResponseTipDto> likeTips = tipMapper.findLikeTips(userId);
+//        List<ResponseGroupOrderDto> likeGroupOrders = groupOrderMapper.findLikeGroupOrders(userId);
+//        responseBoardDtoList.addAll(likeGroupOrders);
 
-        responseBoardDtoList.addAll(likeGroupOrders);
-        responseBoardDtoList.addAll(likeTips);
+        List<ResponseRoommatePostDto> responseLikeDtoList = new ArrayList<>();
+        List<RoommateBoardLike> likeRoommateBoardLikes = roommateBoardLikeRepository.findByUserId(userId);
+        for (RoommateBoardLike likeRoommateBoardLike : likeRoommateBoardLikes) {
+            RoommateBoard roommateBoard = likeRoommateBoardLike.getRoommateBoard();
+            ResponseRoommatePostDto responseRoommatePostDto = ResponseRoommatePostDto.entityToDto(roommateBoard, false);
+            responseLikeDtoList.add(responseRoommatePostDto);
+        }
+
+        List<ResponseTipDto> responseTipDtos = new ArrayList<>();
+        List<TipLike> tipLikes = tipLikeRepository.findByUserId(userId);
+        for (TipLike tipLike : tipLikes) {
+            Tip tip = tipLike.getTip();
+            ResponseTipDto responseTipDto = ResponseTipDto.entityToDto(tip);
+            responseTipDtos.add(responseTipDto);
+        }
+
+        responseBoardDtoList.addAll(responseLikeDtoList);
+        responseBoardDtoList.addAll(responseTipDtos);
+
+        // 로그 추가로 디버깅
+        log.info("정렬 전 데이터:");
+        for (ResponseBoardDto board : responseBoardDtoList) {
+            log.info("Type: {}, CreateDate: {}, Title: {}", board.getType(), board.getCreateDate(), board.getTitle());
+        }
 
         // 최신순 정렬 (createTime이 가장 최근인 것부터)
         responseBoardDtoList.sort(Comparator.comparing(ResponseBoardDto::getCreateDate).reversed());
+
+        // 정렬 후 로그
+        log.info("정렬 후 데이터:");
+        for (ResponseBoardDto board : responseBoardDtoList) {
+            log.info("Type: {}, CreateDate: {}, Title: {}", board.getType(), board.getCreateDate(), board.getTitle());
+        }
 
         return responseBoardDtoList;
     }

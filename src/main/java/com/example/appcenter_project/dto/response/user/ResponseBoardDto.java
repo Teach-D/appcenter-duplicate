@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 public abstract class ResponseBoardDto {
 
-    private Long id;
+    private Long boardId;
     private String title;
     private String type;
     private LocalDateTime createDate;

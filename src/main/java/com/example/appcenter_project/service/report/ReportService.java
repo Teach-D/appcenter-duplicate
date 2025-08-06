@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.example.appcenter_project.exception.ErrorCode.*;
@@ -41,6 +42,7 @@ public class ReportService {
 
     public List<ResponseReportDto> getAllReports() {
         List<Report> reports = reportRepository.findAll();
+        Collections.reverse(reports);
         List<ResponseReportDto> responseReportDtos = new ArrayList<>();
 
         for (Report report : reports) {

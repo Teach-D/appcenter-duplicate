@@ -24,11 +24,29 @@ import org.springframework.web.bind.annotation.*;
 public class MyRoommateController implements MyRoommateApiSpecification {
 
     private final MyRoommateService myRoommateService;
+
     @GetMapping("/informations")
     public ResponseEntity<ResponseMyRoommateInfoDto> getMyRoommate(@AuthenticationPrincipal CustomUserDetails userDetails, HttpServletRequest request) {
         Long userId = userDetails.getId();
         ResponseMyRoommateInfoDto response = myRoommateService.getMyRoommateInfo(userId, request);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = "/image")
+    public ResponseEntity<ImageLinkDto> findUserImageByUserId(
+            @AuthenticationPrincipal CustomUserDetails user,
+            HttpServletRequest request) {
+        try {
+
+            ImageLinkDto imageLinkDto = myRoommateService.getMyRoommateImage(user.getId(), request);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                    .body(imageLinkDto);
+        } catch (Exception e) {
+            log.error("Error retrieving user image: ", e);
+            throw e;
+        }
     }
 
     @GetMapping("/time-table-image")

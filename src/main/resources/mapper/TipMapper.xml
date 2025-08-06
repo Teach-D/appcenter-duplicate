@@ -4,7 +4,7 @@
 <mapper namespace="com.example.appcenter_project.mapper.TipMapper">
 
     <resultMap id="tipResultMap" type="com.example.appcenter_project.dto.response.tip.ResponseTipDto">
-        <id property="id" column="id"/>
+        <id property="boardId" column="id"/>
         <result property="title" column="title"/>
         <result property="type" column="type"/>
         <result property="createDate" column="created_date"/>
@@ -97,6 +97,8 @@
             <result property="reply" column="reply"/>
             <result property="parentId" column="parent_id"/>
             <result property="isDeleted" column="is_deleted"/>
+            <result property="createdDate" column="comment_created_date"/>
+            <result property="name" column="user_name"/>
         </collection>
     </resultMap>
 
@@ -114,11 +116,14 @@
             tc.user_id,
             tc.reply,
             tc.parent_id,
-            tc.is_deleted
+            tc.is_deleted,
+            tc.created_date AS comment_created_date,
+            u.name AS user_name
 
         FROM tip t
         LEFT JOIN tip_like tl ON t.id = tl.tip_id
-        LEFT JOIN tip_comment tc ON t.id =tc.tip_id
+        LEFT JOIN tip_comment tc ON t.id = tc.tip_id
+        LEFT JOIN user u ON tc.user_id = u.id
         WHERE t.id = #{tipId}
     </select>
 </mapper>

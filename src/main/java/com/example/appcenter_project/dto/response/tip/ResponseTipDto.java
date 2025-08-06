@@ -35,9 +35,14 @@ public class ResponseTipDto extends ResponseBoardDto {
     }
 
     public static ResponseTipDto entityToDto(Tip tip) {
-        Image image = tip.getImageList().get(0);
-        String fullPath = image.getFilePath();
-        String fileName = extractFileName(fullPath);
+        String fileName = null;
+        
+        // 이미지 리스트가 존재하고 비어있지 않은 경우에만 처리
+        if (tip.getImageList() != null && !tip.getImageList().isEmpty()) {
+            Image image = tip.getImageList().get(0);
+            String fullPath = image.getFilePath();
+            fileName = extractFileName(fullPath);
+        }
 
         return ResponseTipDto.builder()
                 .boardId(tip.getId())
