@@ -35,13 +35,13 @@ jobs:
         run: ./gradlew clean build
 
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}/main:latest .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.MAIN_CONTAINER_NAME }}/main:latest .
 
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}/main:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.MAIN_CONTAINER_NAME }}/main:latest
 
   deploy:
     if: github.ref == 'refs/heads/main'
@@ -61,10 +61,10 @@ jobs:
             docker rm ${{ secrets.MAIN_CONTAINER_NAME }} || true
             
             # 해당 이미지만 삭제 (다른 이미지에 영향 없음)
-            docker rmi ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}/main:latest || true
+            docker rmi ${{ secrets.DOCKER_USERNAME }}/${{ secrets.MAIN_CONTAINER_NAME }}/main:latest || true
             
             # Docker 이미지 Pull
-            docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}/main:latest
+            docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.MAIN_CONTAINER_NAME }}/main:latest
             
             # Docker Volume 생성 (이미 존재하면 무시됨)
             docker volume create unidorm-images || true
@@ -79,4 +79,4 @@ jobs:
               -v unidorm-images:/app/images \
               -v unidorm-uploads:/app/files \
               --restart unless-stopped \
-              ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}/main:latest
+              ${{ secrets.DOCKER_USERNAME }}/${{ secrets.MAIN_CONTAINER_NAME }}/main:latest
