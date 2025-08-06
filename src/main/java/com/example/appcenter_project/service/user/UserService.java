@@ -144,14 +144,25 @@ public class UserService {
             responseLikeDtoList.add(responseRoommatePostDto);
         }
 
-
         List<ResponseTipDto> likeTips = tipMapper.findLikeTips(userId);
 
         responseBoardDtoList.addAll(responseLikeDtoList);
         responseBoardDtoList.addAll(likeTips);
 
+        // 로그 추가로 디버깅
+        log.info("정렬 전 데이터:");
+        for (ResponseBoardDto board : responseBoardDtoList) {
+            log.info("Type: {}, CreateDate: {}, Title: {}", board.getType(), board.getCreateDate(), board.getTitle());
+        }
+
         // 최신순 정렬 (createTime이 가장 최근인 것부터)
-         responseBoardDtoList.sort(Comparator.comparing(ResponseBoardDto::getCreateDate).reversed());
+        responseBoardDtoList.sort(Comparator.comparing(ResponseBoardDto::getCreateDate).reversed());
+
+        // 정렬 후 로그
+        log.info("정렬 후 데이터:");
+        for (ResponseBoardDto board : responseBoardDtoList) {
+            log.info("Type: {}, CreateDate: {}, Title: {}", board.getType(), board.getCreateDate(), board.getTitle());
+        }
 
         return responseBoardDtoList;
     }
