@@ -1,17 +1,20 @@
 package com.example.appcenter_project.service.roommate;
 
 import com.example.appcenter_project.dto.request.roommate.RequestRoommateFormDto;
+import com.example.appcenter_project.dto.response.roommate.ResponseRoommateCheckListDto;
 import com.example.appcenter_project.dto.response.roommate.ResponseRoommatePostDto;
 import com.example.appcenter_project.dto.response.roommate.ResponseRoommateSimilarityDto;
 import com.example.appcenter_project.entity.like.RoommateBoardLike;
 import com.example.appcenter_project.entity.roommate.RoommateBoard;
 import com.example.appcenter_project.entity.roommate.RoommateCheckList;
 import com.example.appcenter_project.entity.user.User;
+import com.example.appcenter_project.enums.roommate.MatchingStatus;
 import com.example.appcenter_project.exception.CustomException;
 import com.example.appcenter_project.exception.ErrorCode;
 import com.example.appcenter_project.repository.like.RoommateBoardLikeRepository;
 import com.example.appcenter_project.repository.roommate.RoommateBoardRepository;
 import com.example.appcenter_project.repository.roommate.RoommateCheckListRepository;
+import com.example.appcenter_project.repository.roommate.RoommateMatchingRepository;
 import com.example.appcenter_project.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,7 @@ public class RoommateService {
     private final RoommateCheckListRepository roommateCheckListRepository;
     private final RoommateBoardRepository roommateBoardRepository;
     private final RoommateBoardLikeRepository roommateBoardLikeRepository;
+    private final RoommateMatchingRepository roommateMatchingRepository;
 
     @Transactional
     public ResponseRoommatePostDto createRoommateCheckListandBoard(RequestRoommateFormDto requestDto, Long userId) {
@@ -88,6 +92,7 @@ public class RoommateService {
                 .userId(user.getId())
                 .userName(user.getName())
                 .createdDate(roommateBoard.getCreatedDate())
+                .isMatched(false)
                 .build();
     }
 
@@ -101,6 +106,7 @@ public class RoommateService {
 
         return boards.stream() //게시글 목록을 하나 꺼내서 준비
                 .map(board -> { //꺼낸 게시글 하나를 꾸미기 시작
+                    boolean isMatched = isRoommateBoardOwnerMatched(board.getId());
                     RoommateCheckList cl = board.getRoommateCheckList(); //룸메이트 보드에있는 체크리스트를 꺼냄
                     User writer = board.getUser();
                     return ResponseRoommatePostDto.builder() //화면에 보여줄 정보를 담아줌
@@ -124,6 +130,7 @@ public class RoommateService {
                             .userId(writer.getId())
                             .userName(writer.getName())
                             .createdDate(board.getCreatedDate())
+                            .isMatched(isMatched)
                             .build(); //dto하나가 만들어짐
                 })
                 .toList(); //만든 dto들을 모아서 리스트로 뭉쳐줌
@@ -133,10 +140,11 @@ public class RoommateService {
     public ResponseRoommatePostDto getRoommateBoardDetail(Long boardId){
         RoommateBoard board = roommateBoardRepository.findById(boardId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOMMATE_BOARD_NOT_FOUND));
-
-        return ResponseRoommatePostDto.entityToDto(board);
+        boolean isMatched = isRoommateBoardOwnerMatched(boardId);
+        return ResponseRoommatePostDto.entityToDto(board, isMatched);
     }
 
+    //유사도 조회
     public List<ResponseRoommateSimilarityDto> getSimilarRoommateBoards(Long userId) {
         // 1. 내 체크리스트 가져오기
         User user = userRepository.findById(userId)
@@ -187,6 +195,7 @@ public class RoommateService {
                 })
                 .map(entry -> {
                     RoommateBoard board = entry.getKey();
+                    boolean isMatched = isRoommateBoardOwnerMatched(board.getId());
                     RoommateCheckList cl = entry.getKey().getRoommateCheckList();
                     User writer = board.getUser();
 
@@ -211,6 +220,7 @@ public class RoommateService {
                             .userId(writer.getId())
                             .userName(writer.getName())
                             .createdDate(board.getCreatedDate())
+                            .isMatched(isMatched)
                             .build();
                 })
                 .toList();
@@ -225,6 +235,7 @@ public class RoommateService {
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOMMATE_BOARD_NOT_FOUND));
 
         RoommateCheckList checkList = board.getRoommateCheckList();
+        boolean isMatched = isRoommateBoardOwnerMatched(board.getId());
 
         if (!checkList.getUser().getId().equals(userId)) {
             throw new CustomException(ErrorCode.ROOMMATE_UPDATE_NOT_ALLOWED);
@@ -236,7 +247,7 @@ public class RoommateService {
             throw new CustomException(ErrorCode.ROOMMATE_CHECKLIST_UPDATE_FAILED);
         }
 
-        return ResponseRoommatePostDto.entityToDto(board);
+        return ResponseRoommatePostDto.entityToDto(board, isMatched);
     }
 
     // 좋아요 추가 (Like)
@@ -297,6 +308,35 @@ public class RoommateService {
         return board.minusLike();
     }
 
+    public boolean isRoommateBoardOwnerMatched(Long boardId) {
+        // 1. 게시글 조회
+        RoommateBoard board = roommateBoardRepository.findById(boardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOMMATE_BOARD_NOT_FOUND));
 
+        User owner = board.getUser();
+
+        // 2. owner가 COMPLETED 상태인 매칭에 포함되어 있는지 검사
+        boolean alreadyMatched =
+                roommateMatchingRepository.existsBySenderAndStatus(owner, MatchingStatus.COMPLETED)
+                        || roommateMatchingRepository.existsByReceiverAndStatus(owner, MatchingStatus.COMPLETED);
+
+        return alreadyMatched;
+    }
+
+    //로그인한 사용자가 좋아요를 눌렀는지 여부를 반환
+    public boolean isRoommateBoardLikedByUser(Long boardId, Long userId) {
+        RoommateBoard board = roommateBoardRepository.findById(boardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOMMATE_BOARD_NOT_FOUND));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOMMATE_USER_NOT_FOUND));
+        return roommateBoardLikeRepository.existsByUserAndRoommateBoard(user, board);
+    }
+
+    @Transactional(readOnly = true)
+    public ResponseRoommateCheckListDto getMyRoommateCheckList(Long userId) {
+        RoommateCheckList checkList = roommateCheckListRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOMMATE_CHECKLIST_NOT_FOUND));
+        return ResponseRoommateCheckListDto.from(checkList);
+    }
 
 }
